@@ -25,5 +25,8 @@ jobs:
     -   name: generate .SRCINFO
         working-directory: firefox-nightly-i18n
         run: |
-          makepkg --printsrcinfo > .SRCINFO
+          useradd builder -m
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod -R a+rw .
+          sudo -Eu builder makepkg --printsrcinfo > .SRCINFO
           
