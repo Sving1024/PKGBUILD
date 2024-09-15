@@ -1,0 +1,4 @@
+[python-accesser-git]
+source = "git"
+git = "https://github.com/URenko/Accesser.git"
+prefix = "v"
