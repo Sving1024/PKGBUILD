@@ -6,6 +6,7 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux
     steps:
+    -   uses: actions/checkout@v4
     -   name: Install dependencies and update
         run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
     -   name: update pkgver
