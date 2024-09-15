@@ -4,12 +4,12 @@ on:
 jobs:
   update_PKGBUILD:
     runs-on: ubuntu-latest
-#    container: archlinux
+    container: archlinux
     steps:
-#    -   name: Install dependencies and update
-#        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
+    -   name: Install dependencies and update
+        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
     -   name: update pkgver
-#        working-directory: firefox-nightly-i18n
+        working-directory: ./firefox-nightly-i18n
         run: |
           ls
           _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
