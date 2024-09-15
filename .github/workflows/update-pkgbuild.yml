@@ -18,6 +18,12 @@ jobs:
           sed -i "s/pkgver=.*$/pkgver=${_version}/" PKGBUILD
           cat PKGBUILD
     -   name: update the sha256sum in PKGBUILD
+        working-directory: firefox-nightly-i18n
         run: |
           updpkgsums
           rm -rf ./firefox-*
+    -   name: generate .SRCINFO
+        working-directory: firefox-nightly-i18n
+        run: |
+          makepkg --printsrcinfo > .SRCINFO
+          
