@@ -122,7 +122,6 @@ _languages=(
 
 pkgname=()
 source=()
-sha256sums=()
 
 for _lang in "${_languages[@]}"; do
   _locale=${_lang%% *}
@@ -130,7 +129,7 @@ for _lang in "${_languages[@]}"; do
 
   pkgname+=($_pkgname)
   source+=("firefox-i18n-${_version}-$_locale.xpi::$_url/firefox-${_version}.$_locale.langpack.xpi")
-  sha256sums+=('SKIP')
+#  sha256sums+=('SKIP')
   eval "package_$_pkgname() {
     _package $_lang
   }"
@@ -144,3 +143,5 @@ _package() {
   install -Dm644 "firefox-i18n-${_version}-$1.xpi" \
       "$pkgdir/opt/firefox-nightly/distribution/extensions/langpack-$1@firefox.mozilla.org.xpi"
 }
+
+sha256sums=()
