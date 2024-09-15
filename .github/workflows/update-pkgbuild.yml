@@ -4,10 +4,10 @@ on:
 jobs:
   update_PKGBUILD:
     runs-on: ubuntu-latest
-    container: archlinux
+#    container: archlinux
     steps:
-    -   name: Install dependencies and update
-        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
+#    -   name: Install dependencies and update
+#        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
     -   name: update pkgver
 #        working-directory: firefox-nightly-i18n
         run: |
