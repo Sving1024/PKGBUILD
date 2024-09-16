@@ -2,9 +2,22 @@ name: Auto updating PKGBUILD
 on:
   push
 jobs:
+  prepare:
+    name: get new pkgver
+    runs-on: ubuntu-latest
+    outputs:
+      pkgver: ${{ steps.get-new-pkgver.outputs.pkgver }}
+    steps:
+    -   name: get new pkgver
+        id: get-new-pkgver
+        run: |
+          _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
+          _version=$(curl "${CURL_OPTS[@]}" ${_url}/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
+          echo "pkgver=${_version}" >> "${GITHUB_OUTPUT}"
   gen_PKGBUILD:
     runs-on: ubuntu-latest
     container: archlinux
+    needs: prepare
     steps:
     -   uses: actions/checkout@v4
     -   name: Install dependencies and update
@@ -12,10 +25,7 @@ jobs:
     -   name: update pkgver
         working-directory: firefox-nightly-i18n
         run: |
-          ls
-          _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
-          _version=$(curl "${CURL_OPTS[@]}" ${_url}/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
-          sed -i "s/pkgver=.*$/pkgver=${_version}/" PKGBUILD
+          sed -i "s/pkgver=.*$/pkgver=${{ needs.prepare.outputs.pkgver }}/" PKGBUILD
           cat PKGBUILD
     -   name: create user for further steps
         run: |
@@ -48,4 +58,18 @@ jobs:
       -   name: Build the package
           working-directory: firefox-nightly-i18n
           run: makepkg
-  
+  push_updates:
+    runs-on: ubuntu-latest
+    needs: prepare
+    steps:
+      -   uses: actions/checkout@v4
+      -   name: remove old ver
+          run: rm -rf firefox-nightly-i18n/PKGBUILD firefox-nightly-i18n/.SRCINFO
+      -   uses: actions/download-artifact@v4
+          with:
+            name: new_ver_of_PKGBUILD
+            path: firefox-nightly-i18n
+      -   uses: Smart-Transportation/push@v1.3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            message: "update to ${{ needs.prepare.outputs.pkgver }}"
