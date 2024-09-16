@@ -2,7 +2,7 @@ name: Auto updating PKGBUILD
 on:
   push
 jobs:
-  update_PKGBUILD:
+  gen_PKGBUILD:
     runs-on: ubuntu-latest
     container: archlinux
     steps:
@@ -31,17 +31,21 @@ jobs:
         working-directory: firefox-nightly-i18n
         run: |
           sudo -Eu builder makepkg --printsrcinfo > .SRCINFO
-    -   name: Push update
-        working-directory: firefox-nightly-i18n
-        run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add PKGBUILD .SRCINFO
-
-          if git diff --cached --quiet; then
-            echo "No changes detected. Skipping commit."
-          else
-            git commit -m "🐎 ci(ReadCat): Update to ${_version}"
-            git push
-          fi
+    -   uses: actions/upload-artifact@v4
+        with:
+          name: new_ver_of_PKGBUILD
+          path: |
+            firefox-nightly-i18n/*
+  test_PKGBUILD:
+    runs-on: ubuntu-latest
+    container: archlinux
+    steps:
+      -   uses: actions/download-artifact@v4
+          with:
+            name: new_ver_of_PKGBUILD
+      -   name: Install dependencies and update
+          run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
+      -   name: Build the package
+          working-directory: firefox-nightly-i18n
+          run: makepkg
+  
