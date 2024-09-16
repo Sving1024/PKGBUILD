@@ -10,14 +10,9 @@ arch=('any')
 license=('MPL' 'GPL' 'LGPL')
 url="https://www.mozilla.org/firefox/"
 
-_url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
-_version=$(curl "${CURL_OPTS[@]}" ${_url}/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
+_version=132.0a1
 
 pkgver=132.0a1
-
-pkgver() {
-  printf ${_version}
-}
 
 depends=("firefox-nightly")
 

@@ -2,13 +2,14 @@ name: Auto updating PKGBUILD
 on:
   push:
   schedule:
-    -  cron: '0 15 */3 * *'
+    -  cron: '0 15 * * *'
 jobs:
   prepare:
     name: get new pkgver
     runs-on: ubuntu-latest
     outputs:
       pkgver: ${{ steps.get-new-pkgver.outputs.pkgver }}
+      version: ${{ steps.get-new-pkgver.outcome.version }}
     steps:
     -   name: get new pkgver
         id: get-new-pkgver
@@ -29,7 +30,8 @@ jobs:
           )
           _build_id_date=${_build_id[date]}
           _build_id_time=${_build_id[time]}
-          echo "pkgver=printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time}" >> "${GITHUB_OUTPUT}"
+          echo "version=${_version}" >> "${GITHUB_OUTPUT}"
+          echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})" >> "${GITHUB_OUTPUT}"
   gen_PKGBUILD:
     runs-on: ubuntu-latest
     container: archlinux
@@ -42,6 +44,7 @@ jobs:
         working-directory: firefox-nightly-i18n
         run: |
           sed -i "s/pkgver=.*$/pkgver=${{ needs.prepare.outputs.pkgver }}/" PKGBUILD
+          sed -i "s/_version=.*$_version=${{ needs.prepare.outputs.version }}" PKGBUILD
           cat PKGBUILD
     -   name: create user for further steps
         run: |
