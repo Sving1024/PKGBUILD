@@ -56,10 +56,6 @@ jobs:
         run: |
           sudo -Eu builder updpkgsums
           rm -rf ./firefox-*
-    -   name: generate .SRCINFO
-        working-directory: firefox-nightly-i18n
-        run: |
-          sudo -Eu builder makepkg --printsrcinfo > .SRCINFO
     -   uses: actions/upload-artifact@v4
         with:
           name: new_ver_of_PKGBUILD

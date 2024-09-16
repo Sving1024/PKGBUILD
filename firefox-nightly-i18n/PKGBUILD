@@ -4,7 +4,7 @@
 
 pkgbase='firefox-nightly-i18n'
 pkgname=("$pkgbase-all")
-pkgrel=2
+pkgrel=1
 pkgdesc="Language pack for Firefox Nightly"
 arch=('any')
 license=('MPL' 'GPL' 'LGPL')
