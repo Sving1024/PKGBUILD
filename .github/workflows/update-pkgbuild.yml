@@ -2,7 +2,7 @@ name: Auto updating PKGBUILD
 on:
   push:
   schedule:
-    -  cron: '0 15 * * *'
+    -  cron: '0 8,20 * * *'
 jobs:
   prepare:
     name: get new pkgver
