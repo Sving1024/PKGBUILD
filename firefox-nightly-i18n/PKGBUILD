@@ -13,7 +13,7 @@ url="https://www.mozilla.org/firefox/"
 _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
 _version=132.0a1
 
-pkgver=132.0a1
+pkgver=132.0a1..
 
 depends=("firefox-nightly")
 
