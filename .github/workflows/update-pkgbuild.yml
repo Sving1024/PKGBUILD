@@ -44,7 +44,7 @@ jobs:
         working-directory: firefox-nightly-i18n
         run: |
           sed -i "s/pkgver=.*$/pkgver=${{ needs.prepare.outputs.pkgver }}/" PKGBUILD
-          sed -i "s/_version=.*$_version=${{ needs.prepare.outputs.version }}" PKGBUILD
+          sed -i "s/_version=.*$/_version=${{ needs.prepare.outputs.version }}/" PKGBUILD
           cat PKGBUILD
     -   name: create user for further steps
         run: |
