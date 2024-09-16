@@ -15,7 +15,21 @@ jobs:
         run: |
           _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
           _version=$(curl "${CURL_OPTS[@]}" ${_url}/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
-          echo "pkgver=${_version}" >> "${GITHUB_OUTPUT}"
+          _build_id_raw="$(curl -s "${_base_url}/latest-mozilla-central/${_name}-${_version}.${_lang}.linux-${CARCH}.checksums" | grep '.partial.mar' | cut -d' ' -f4 | grep -E -o '[[:digit:]]{14}' | sort | tail -n1)"
+          declare -A _build_id
+          _build_id=(
+            [year]="${_build_id_raw:0:4}"
+            [month]="${_build_id_raw:4:2}"
+            [day]="${_build_id_raw:6:2}"
+            [hour]="${_build_id_raw:8:2}"
+            [min]="${_build_id_raw:10:2}"
+            [sec]="${_build_id_raw:12:2}"
+            [date]="${_build_id_raw:0:8}"
+            [time]="${_build_id_raw:8:6}"
+          )
+          _build_id_date=${_build_id[date]}
+          _build_id_time=${_build_id[time]}
+          echo "pkgver=printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time}" >> "${GITHUB_OUTPUT}"
   gen_PKGBUILD:
     runs-on: ubuntu-latest
     container: archlinux
