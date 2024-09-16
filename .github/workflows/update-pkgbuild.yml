@@ -42,6 +42,6 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes detected. Skipping commit."
           else
-            git commit -m "🐎 ci(ReadCat): Update to v${PKG_VER}_${PKG_SUB_VER}"
+            git commit -m "🐎 ci(ReadCat): Update to ${_version}"
             git push
           fi
