@@ -45,7 +45,8 @@ jobs:
         with:
           name: new_ver_of_PKGBUILD
           path: |
-            firefox-nightly-i18n/*
+            firefox-nightly-i18n/PKGBUILD
+            firefox-nightly-i18n/.SRCINFO
   push_updates:
     runs-on: ubuntu-latest
     needs: [ prepare, gen_PKGBUILD ]
