@@ -86,7 +86,7 @@ jobs:
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
             pkgname: firefox-nightly-i18n
-            test: true
+#            test: true
             updpkgsums: false
             commit_username: "github-actions[bot]"
             commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
