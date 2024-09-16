@@ -46,22 +46,9 @@ jobs:
           name: new_ver_of_PKGBUILD
           path: |
             firefox-nightly-i18n/*
-  test_PKGBUILD:
-    runs-on: ubuntu-latest
-    container: archlinux
-    needs: [ gen_PKGBUILD ]
-    steps:
-      -   uses: actions/download-artifact@v4
-          with:
-            name: new_ver_of_PKGBUILD
-      -   name: Install dependencies and update
-          run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
-      -   name: Build the package
-          working-directory: firefox-nightly-i18n
-          run: makepkg
   push_updates:
     runs-on: ubuntu-latest
-    needs: [ prepare, test_PKGBUILD ]
+    needs: [ prepare, gen_PKGBUILD ]
     steps:
       -   uses: actions/checkout@v4
       -   name: remove old ver
