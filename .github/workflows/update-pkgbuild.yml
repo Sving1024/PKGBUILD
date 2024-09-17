@@ -78,7 +78,7 @@ jobs:
             branch: main
   publish_to_AUR:
     runs-on: ubuntu-latest
-    needs: [ push_updates,prepare ]
+    needs: [ prepare ]
     steps:
       -   uses: actions/download-artifact@v4
           with:
