@@ -112,7 +112,7 @@ jobs:
             echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
             chmod -R a+rw .
       -   name: upd
-          run: sudo -Eu builder source ./.github/workflows/update-pkgbuild-lang.sh
+          run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh
       -   uses: Smart-Transportation/push@v1.3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
