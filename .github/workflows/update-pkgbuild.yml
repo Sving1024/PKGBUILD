@@ -101,7 +101,10 @@ jobs:
   update_oth_lang:
     runs-on: ubuntu-latest
     needs: [ push_updates,prepare ]
+    container: archlinux
     steps:
+      -   name: Install dependencies and update
+          run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
       -   uses: actions/checkout@v4
       -   name: upd
           run: source ./.github/workflows/update-pkgbuild-lang.sh
