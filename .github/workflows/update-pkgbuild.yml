@@ -98,3 +98,15 @@ jobs:
             commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
             allow_empty_commits: false
             pkgbuild: firefox-nightly-i18n/PKGBUILD
+  update_oth_lang:
+    runs-on: ubuntu-latest
+    needs: [ push_updates,prepare ]
+    steps:
+      -   uses: actions/checkout@v4
+      -   name: upd
+          run: source ./.github/workflows/update-pkgbuild-lang.sh
+      -   uses: Smart-Transportation/push@v1.3
+          with:
+            github_token: ${{ secrets.GITHUB_TOKEN }}
+            message: "update to ${{ needs.prepare.outputs.pkgver }}"
+            branch: main
