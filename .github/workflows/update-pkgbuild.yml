@@ -106,8 +106,13 @@ jobs:
       -   name: Install dependencies and update
           run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
       -   uses: actions/checkout@v4
+      -   name: create user for further steps
+          run: |
+            useradd builder -m
+            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+            chmod -R a+rw .
       -   name: upd
-          run: source ./.github/workflows/update-pkgbuild-lang.sh
+          run: sudo -Eu builder source ./.github/workflows/update-pkgbuild-lang.sh
       -   uses: Smart-Transportation/push@v1.3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
