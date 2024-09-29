@@ -13,8 +13,8 @@ pkgver=132.0a1..
 
 depends=("firefox-nightly")
 
-_language="Asturian"
-_language_short=ast
+_language="Azerbaijani"
+_language_short=az
 _pkgname_base=firefox-nightly-i18n
 pkgname=${_pkgname_base}-${_language_short,,}
 pkgdesc="${_language} language pack for Firefox Nightly"
@@ -25,7 +25,7 @@ source=("${_pkgname_base}-${_language_short}.xpi::$_url/firefox-${_version}.${_l
 # Don't extract anything
 noextract=("${_pkgname_base}-${_language_short}.xpi")
 
-sha256sums=('0fda8bee22f9ff4dac3bf9ebe02f9de00cb0dc6263224f3a8b8557c1afe2fd25')
+sha256sums=('SKIP')
 
 package() {
   install -Dm644 "${_pkgname_base}-${_language_short}.xpi" \
