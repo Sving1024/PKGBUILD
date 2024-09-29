@@ -11,7 +11,7 @@ _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/lin
 _version=132.0a1
 pkgver=132.0a1.20240917.213026
 
-depends=("firefox-nightly")
+depends=("firefox-nightly-bin")
 
 _language=placeholder
 _language_short=placeholder
