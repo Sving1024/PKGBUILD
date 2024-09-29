@@ -40,6 +40,8 @@ jobs:
       -   name: Install dependencies and update
           run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
       -   uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
       -   name: create user for further steps
           run: |
             useradd builder -m
