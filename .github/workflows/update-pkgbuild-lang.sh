@@ -139,5 +139,6 @@ _languages=(
 )
 
 for _lang in "${_languages[@]}"; do
-  eval "update $_lang"
+    pwd
+    eval "update $_lang"
 done

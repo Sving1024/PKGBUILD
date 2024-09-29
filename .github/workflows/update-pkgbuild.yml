@@ -32,75 +32,9 @@ jobs:
           _build_id_time=${_build_id[time]}
           echo "version=${_version}" >> "${GITHUB_OUTPUT}"
           echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})" >> "${GITHUB_OUTPUT}"
-  gen_PKGBUILD:
-    runs-on: ubuntu-latest
-    container: archlinux
-    needs: prepare
-    steps:
-    -   uses: actions/checkout@v4
-    -   name: Install dependencies and update
-        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
-    -   name: update pkgver
-        working-directory: firefox-nightly-i18n
-        run: |
-          sed -i "s/pkgver=.*$/pkgver=${{ needs.prepare.outputs.pkgver }}/" PKGBUILD
-          sed -i "s/_version=.*$/_version=${{ needs.prepare.outputs.version }}/" PKGBUILD
-          cat PKGBUILD
-    -   name: create user for further steps
-        run: |
-          useradd builder -m
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          chmod -R a+rw .
-    -   name: update the sha256sum in PKGBUILD
-        working-directory: firefox-nightly-i18n
-        run: |
-          sudo -Eu builder updpkgsums
-    -   uses: actions/upload-artifact@v4
-        with:
-          name: new_ver_of_PKGBUILD
-          path: |
-            firefox-nightly-i18n/PKGBUILD
-  push_updates:
-    runs-on: ubuntu-latest
-    needs: [ prepare, gen_PKGBUILD ]
-    steps:
-      -   uses: actions/checkout@v4
-      -   name: remove old ver
-          run: rm -rf firefox-nightly-i18n/PKGBUILD
-      -   uses: actions/download-artifact@v4
-          with:
-            name: new_ver_of_PKGBUILD
-            path: firefox-nightly-i18n
-      -   uses: Smart-Transportation/push@v1.3
-          with:
-            github_token: ${{ secrets.GITHUB_TOKEN }}
-            message: "update to ${{ needs.prepare.outputs.pkgver }}"
-            branch: main
-  publish_to_AUR:
-    runs-on: ubuntu-latest
-    needs: [ prepare,gen_PKGBUILD ]
-    steps:
-      -   uses: actions/download-artifact@v4
-          with:
-            name: new_ver_of_PKGBUILD
-            path: firefox-nightly-i18n
-      -   name: Cat PKGBUILD
-          run: cat firefox-nightly-i18n/PKGBUILD
-      -   name: Publish AUR package
-          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
-          with:
-            pkgname: firefox-nightly-i18n
-            test: true
-            updpkgsums: false
-            commit_username: "github-actions[bot]"
-            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-            commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
-            allow_empty_commits: false
-            pkgbuild: firefox-nightly-i18n/PKGBUILD
   update_oth_lang:
     runs-on: ubuntu-latest
-    needs: [ push_updates,prepare ]
+    needs: prepare
     container: archlinux
     steps:
       -   name: Install dependencies and update
@@ -111,8 +45,13 @@ jobs:
             useradd builder -m
             echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
             chmod -R a+rw .
+            pwd
       -   name: upd
           run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh
+      -   name: debug
+          run: |
+            pwd
+            ls -laZ
       -   uses: Smart-Transportation/push@v1.3
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
