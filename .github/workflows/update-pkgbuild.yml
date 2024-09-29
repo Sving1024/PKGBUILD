@@ -54,7 +54,8 @@ jobs:
           run: |
             pwd
             ls -laZ
-      -   uses: Smart-Transportation/push@v1.3
+      -   name: GitHub Commit & Push
+          uses: actions-js/push@v1.5    
           with:
             github_token: ${{ secrets.GITHUB_TOKEN }}
             message: "update to ${{ needs.prepare.outputs.pkgver }}"
