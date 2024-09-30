@@ -69,6 +69,7 @@ jobs:
     -   uses: actions/download-artifact@v4
         with:
           name: new_ver_of_PKGBUILD
+          path: firefox-nightly-i18n/
     -   uses: actions-js/push@v1.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
