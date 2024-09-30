@@ -36,7 +36,7 @@ function update(){
     if [ ! -f ./firefox-nightly-i18n/PKGBUILD-$1/PKGBUILD ]; then
         rm ./firefox-nightly-i18n/PKGBUILD-$1/PKGBUILD
     fi
-    mv ./tmp/firefox-nightly-i18n-$1/PKGBUILD ./firefox-nightly-i18n/PKGBUILD-$1/PKGBUILD
+    mv ./tmp/firefox-nightly-i18n-$1/PKGBUILD ./firefox-nightly-i18n/$1/PKGBUILD
     rm -rf ./tmp/firefox-nightly-i18n-$1
 }
 
