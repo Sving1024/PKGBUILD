@@ -25,7 +25,7 @@ source=("${_pkgname_base}-${_language_short}.xpi::$_url/firefox-${_version}.${_l
 # Don't extract anything
 noextract=("${_pkgname_base}-${_language_short}.xpi")
 
-sha256sums=('9191a4f5b0c182bedcba7b59c1d3e16fd95f70123662e8ab6c07fb57f94a8708')
+sha256sums=('ebf2d2dc87a16299d7c9cc97590d2ea6e630eb980fffed0db8d2b2422b20cace')
 
 package() {
   install -Dm644 "${_pkgname_base}-${_language_short}.xpi" \
