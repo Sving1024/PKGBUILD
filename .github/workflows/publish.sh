@@ -57,7 +57,8 @@ git config --global user.email "$commit_email"
 echo '::endgroup::'
 
 echo '::group::Cloning AUR package into /tmp/local-repo'
-git clone -v "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
+#git clone -v "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
+git -c init.defaultBranch=master clone "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
 echo '::endgroup::'
 
 echo '::group::Copying files into /tmp/local-repo'
@@ -125,7 +126,7 @@ esac
 echo '::endgroup::'
 
 echo '::group::Publishing the repository'
-git remote add aur "ssh://aur@aur.archlinux.org/${pkgname}.git"
+#git remote add aur "ssh://aur@aur.archlinux.org/${pkgname}.git"
 case "$force_push" in
 true)
   git push -v --force aur master
