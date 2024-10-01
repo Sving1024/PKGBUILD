@@ -84,18 +84,39 @@ jobs:
     -   name: instll deps
         run: |
           pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
+    -   name: create new package
+        run: |
+          useradd builder -m
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod -R a+rw .
+          pwd  
     -   name: config ssh
         run: |
-          mkdir ~/.ssh/
+          #!/bin/bash
+          set -o errexit -o pipefail -o nounset
+          echo '::group::Creating builder user'
+          useradd --create-home --shell /bin/bash builder
+          passwd --delete builder
+          mkdir -p /etc/sudoers.d/
+          echo "builder  ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder
+          echo '::endgroup::'
+          echo '::group::Initializing SSH directory'
+          mkdir -pv /home/builder/.ssh
+          touch /home/builder/.ssh/known_hosts
+          cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
+          chown -vR builder:builder /home/builder
+          chmod -vR 600 /home/builder/.ssh/*
+          echo '::endgroup::'
           # Ignore "." and ".." to prevent errors when glob pattern for assets matches hidden files
           GLOBIGNORE=".:.."
 
           echo '::group::Adding aur.archlinux.org to known hosts'
+          ssh_keyscan_types='rsa,ecdsa,ed25519'
           ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >>~/.ssh/known_hosts
           echo '::endgroup::'
 
           echo '::group::Importing private key'
-          echo "${{ secrets.AUR_SSH_PRIVATE_KEY }}" >~/.ssh/aur
+          echo "${{secrets.AUR_SSH_PRIVATE_KEY}}" >~/.ssh/aur
           chmod -vR 600 ~/.ssh/aur*
           ssh-keygen -vy -f ~/.ssh/aur >~/.ssh/aur.pub
           echo '::endgroup::'
@@ -106,11 +127,5 @@ jobs:
     -   uses: actions/download-artifact@v4
         with:
           name: new_ver_of_PKGBUILD
-    -   name: create new package
-        run: |
-          useradd builder -m
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          chmod -R a+rw .
-          pwd
     -   name: publish
-        run: ./.github/workflows/publish2aur.sh
+        run: sudo -Eu builder ./.github/workflows/publish2aur.sh
