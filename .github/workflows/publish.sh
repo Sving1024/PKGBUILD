@@ -18,6 +18,22 @@ set -o errexit -o pipefail -o nounset
 #force_push=$INPUT_FORCE_PUSH
 #ssh_keyscan_types=$INPUT_SSH_KEYSCAN_TYPES
 
+pkgname=firefox-nightly-i18n-$1
+pkgbuild=./firefox-nightly-i18n/$1/PKGBUILD
+assets=''
+updpkgsums='false'
+test='true'
+TEST_FLAGS='--clean --cleanbuild --nodeps'
+read -r -a test_flags <<< $TEST_FLAGS
+commit_username="github-actions[bot]"
+commit_email='github-actions[bot]@users.noreply.github.com'
+echo "$(cat ${pkgbuild} | grep pkgver)"
+eval "$(cat ${pkgbuild} | grep pkgver)"
+commit_message="update to ${pkgver}"
+allow_empty_commits='false'
+force_push='false'
+ssh_keyscan_types='rsa,ecdsa,ed25519'
+
 assert_non_empty() {
   name=$1
   value=$2

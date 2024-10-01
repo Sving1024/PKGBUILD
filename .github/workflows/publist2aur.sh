@@ -2,23 +2,7 @@ _url=https://ftp.mozilla.org/pub/firefox/nightly
 function publish(){
     echo $1
     echo $2
-    pkgname=firefox-nightly-i18n-$1
-    pkgbuild=./firefox-nightly-i18n/$1/PKGBUILD
-    assets=''
-    updpkgsums='false'
-    test='true'
-    TEST_FLAGS='--clean --cleanbuild --nodeps'
-    read -r -a test_flags <<< $TEST_FLAGS
-    commit_username="github-actions[bot]"
-    commit_email='github-actions[bot]@users.noreply.github.com'
-    echo "$(cat ${pkgbuild} | grep pkgver)"
-    eval "$(cat ${pkgbuild} | grep pkgver)"
-    commit_message="update to ${pkgver}"
-    allow_empty_commits='false'
-    force_push='false'
-    ssh_keyscan_types='rsa,ecdsa,ed25519'
-    echo ${pkgver}
-    ./.github/workflows/publish.sh
+    ./.github/workflows/publish.sh $1
 }
 
 _languages=(
@@ -119,7 +103,9 @@ _languages=(
   'zh-TW  "Chinese (Traditional)"'
 )
 
-for _lang in "${_languages[@]}"; do
-    pwd
-    eval "publish $_lang"
-done
+#for _lang in "${_languages[@]}"; do
+#    pwd
+#    eval "publish $_lang"
+#done
+
+publish ach

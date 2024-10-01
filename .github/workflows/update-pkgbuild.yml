@@ -81,6 +81,9 @@ jobs:
     needs: [ update_oth_lang,prepare ]
     steps:
     -   uses: actions/checkout@v4
+    -   name: instll deps
+        run: |
+          pacman -S --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
     -   name: config ssh
         run: |
           mkdir ~/.ssh/
@@ -103,5 +106,11 @@ jobs:
     -   uses: actions/download-artifact@v4
         with:
           name: new_ver_of_PKGBUILD
+    -   name: create new package
+        run: |
+          useradd builder -m
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod -R a+rw .
+          pwd
     -   name: publish
         run: ./.github/workflows/publish2aur.sh
