@@ -8,8 +8,8 @@ license=('MPL' 'GPL' 'LGPL')
 url="https://www.mozilla.org/firefox/"
 _url=https://ftp.mozilla.org/pub/firefox/nightly/latest-mozilla-central-l10n/linux-x86_64/xpi
 
-_version=132.0a1
-pkgver=132.0a1..
+_version=133.0a1
+pkgver=133.0a1..
 
 depends=("firefox-nightly-bin")
 
@@ -25,7 +25,7 @@ source=("${_pkgname_base}-${_language_short}.xpi::$_url/firefox-${_version}.${_l
 # Don't extract anything
 noextract=("${_pkgname_base}-${_language_short}.xpi")
 
-sha256sums=('082dbe31758e26d88128743cd3e6c587dcbe378ea4d739a898417b21b8e49217')
+sha256sums=('8e6e41f53034e34b026898964340b3ecddaf55bb15a14d826dfe7deb20769a1e')
 
 package() {
   install -Dm644 "${_pkgname_base}-${_language_short}.xpi" \
