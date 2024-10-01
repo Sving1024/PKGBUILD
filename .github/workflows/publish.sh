@@ -139,3 +139,5 @@ false)
   ;;
 esac
 echo '::endgroup::'
+
+rm -rf /tmp/local-repo
