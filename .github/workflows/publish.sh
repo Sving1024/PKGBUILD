@@ -32,6 +32,7 @@ eval "$(cat ${pkgbuild} | grep pkgver)"
 commit_message="update to ${pkgver}"
 allow_empty_commits='false'
 force_push='false'
+post_process=''
 
 assert_non_empty() {
   name=$1
