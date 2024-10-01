@@ -97,27 +97,11 @@ jobs:
           echo '::group::Initializing SSH directory'
           mkdir -pv /home/builder/.ssh
           touch /home/builder/.ssh/known_hosts
+          cp -v /ssh_config /home/builder/.ssh/config
           chown -vR builder:builder /home/builder
-          sudo -Eu builder cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
           chmod -vR 600 /home/builder/.ssh/*
           echo '::endgroup::'
-          # Ignore "." and ".." to prevent errors when glob pattern for assets matches hidden files
-          GLOBIGNORE=".:.."
-
-          echo '::group::Adding aur.archlinux.org to known hosts'
-          ssh_keyscan_types='rsa,ecdsa,ed25519'
-          sudo -Eu builder ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >> /home/builder/.ssh/known_hosts
-          echo '::endgroup::'
-
-          echo '::group::Importing private key'
-          sudo -Eu builder echo "${{secrets.AUR_SSH_PRIVATE_KEY}}" > /home/builder/.ssh/aur
-          chmod -vR 600 /home/builder/.ssh/aur*
-          sudo -Eu builder ssh-keygen -vy -f /home/builder/.ssh/aur > /home/builder/.ssh/aur.pub
-          echo '::endgroup::'
-
-          echo '::group::Checksums of SSH keys'
-          sudo -Eu builder sha512sum /home/builder/.ssh/aur /home/builder/.ssh/aur.pub
-          echo '::endgroup::'
+          sudo -Eu builder sh ./.github/workflows/config_ssh.sh ${{secrets.AUR_SSH_PRIVATE_KEY}}
     -   uses: actions/download-artifact@v4
         with:
           name: new_ver_of_PKGBUILD
