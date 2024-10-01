@@ -83,6 +83,7 @@ jobs:
     -   uses: actions/checkout@v4
     -   name: config ssh
         run: |
+          mkdir ~/.ssh/
           # Ignore "." and ".." to prevent errors when glob pattern for assets matches hidden files
           GLOBIGNORE=".:.."
 

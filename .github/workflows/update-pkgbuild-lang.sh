@@ -27,7 +27,7 @@ function update(){
         sed -i "s/_version=.*$/_version=${_version}/" PKGBUILD
         sed -i "s/_language=placeholder/_language=\"$2\"/" PKGBUILD
         sed -i "s/_language_short=placeholder/_language_short=$1/" PKGBUILD
-        cat PKGBUILD
+#        cat PKGBUILD
         updpkgsums
 #        makepkg
     popd
