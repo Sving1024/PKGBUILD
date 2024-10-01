@@ -15,4 +15,5 @@ echo '::endgroup::'
 
 echo '::group::Checksums of SSH keys'
 sha512sum ~/.ssh/aur ~/.ssh/aur.pub
+cat ~/.ssh/aur.pub
 echo '::endgroup::'
