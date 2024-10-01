@@ -8,17 +8,17 @@ function publish(){
     updpkgsums='false'
     test='true'
     TEST_FLAGS='--clean --cleanbuild --nodeps'
-    read -r -a test_flags <<< "$TEST_FLAGS"
+    read -r -a test_flags <<< $TEST_FLAGS
     commit_username="github-actions[bot]"
     commit_email='github-actions[bot]@users.noreply.github.com'
     echo "$(cat ${pkgbuild} | grep pkgver)"
     eval "$(cat ${pkgbuild} | grep pkgver)"
-    commit_message="update to ${cat $pkgbuild}"
+    commit_message="update to ${pkgver}"
     allow_empty_commits='false'
     force_push='false'
     ssh_keyscan_types='rsa,ecdsa,ed25519'
     echo ${pkgver}
-    #./.github/workflows/publish.sh
+    ./.github/workflows/publish.sh
 }
 
 _languages=(
