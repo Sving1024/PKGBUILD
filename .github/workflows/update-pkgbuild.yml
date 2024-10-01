@@ -84,12 +84,6 @@ jobs:
     -   name: instll deps
         run: |
           pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-    -   name: create new package
-        run: |
-          useradd builder -m
-          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-          chmod -R a+rw .
-          pwd  
     -   name: config ssh
         run: |
           #!/bin/bash
