@@ -111,7 +111,7 @@ jobs:
 
           echo '::group::Importing private key'
           sudo -Eu builder echo "${{secrets.AUR_SSH_PRIVATE_KEY}}" > /home/builder/.ssh/aur
-          sudo -Eu builder chmod -vR 600 /home/builder/.ssh/aur*
+          chmod -vR 600 /home/builder/.ssh/aur*
           sudo -Eu builder ssh-keygen -vy -f /home/builder/.ssh/aur > /home/builder/.ssh/aur.pub
           echo '::endgroup::'
 
