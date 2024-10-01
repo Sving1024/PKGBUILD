@@ -105,7 +105,7 @@ jobs:
           GLOBIGNORE=".:.."
 
           echo '::group::Adding aur.archlinux.org to known hosts'
-          sudo -Eu builder ssh_keyscan_types='rsa,ecdsa,ed25519'
+          ssh_keyscan_types='rsa,ecdsa,ed25519'
           sudo -Eu builder ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >> /home/builder/.ssh/known_hosts
           echo '::endgroup::'
 
