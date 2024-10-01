@@ -18,8 +18,8 @@ set -o errexit -o pipefail -o nounset
 #force_push=$INPUT_FORCE_PUSH
 #ssh_keyscan_types=$INPUT_SSH_KEYSCAN_TYPES
 
-pkgname=firefox-nightly-i18n-$1
-pkgbuild=./firefox-nightly-i18n/$1/PKGBUILD
+pkgname=firefox-nightly-i18n-${1,,}
+pkgbuild=./firefox-nightly-i18n/${1}/PKGBUILD
 assets=''
 updpkgsums='false'
 test='true'
