@@ -101,7 +101,7 @@ jobs:
           chown -vR builder:builder /home/builder
           chmod -vR 600 /home/builder/.ssh/*
           echo '::endgroup::'
-          sudo -Eu builder sh ./.github/workflows/config_ssh.sh ${{secrets.AUR_SSH_PRIVATE_KEY}}
+          sudo -Eu builder sh ./.github/workflows/config_ssh.sh "${{secrets.AUR_SSH_PRIVATE_KEY}}"
 #    -   uses: actions/download-artifact@v4
 #        with:
 #          name: new_ver_of_PKGBUILD

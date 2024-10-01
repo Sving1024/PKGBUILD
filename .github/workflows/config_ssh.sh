@@ -8,9 +8,6 @@ ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >> /home/builder/.ssh/k
 echo '::endgroup::'
 
 echo '::group::Importing private key'
-echo $1
-echo $2
-echo $3
 echo "$1" > /home/builder/.ssh/aur
 chmod -vR 600 /home/builder/.ssh/aur*
 ssh-keygen -vy -f /home/builder/.ssh/aur > /home/builder/.ssh/aur.pub
