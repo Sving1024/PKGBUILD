@@ -83,7 +83,7 @@ jobs:
     -   uses: actions/checkout@v4
     -   name: instll deps
         run: |
-          pacman -S --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
+          pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
     -   name: config ssh
         run: |
           mkdir ~/.ssh/
