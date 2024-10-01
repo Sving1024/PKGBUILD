@@ -122,4 +122,4 @@ jobs:
         with:
           name: new_ver_of_PKGBUILD
     -   name: publish
-        run: sudo -Eu builder ./.github/workflows/publish2aur.sh
+        run: sudo -Eu builder sh ./.github/workflows/publish2aur.sh
