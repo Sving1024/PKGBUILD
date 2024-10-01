@@ -97,8 +97,8 @@ jobs:
           echo '::group::Initializing SSH directory'
           mkdir -pv /home/builder/.ssh
           touch /home/builder/.ssh/known_hosts
-          sudo -Eu builder cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
           chown -vR builder:builder /home/builder
+          sudo -Eu builder cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
           chmod -vR 600 /home/builder/.ssh/*
           echo '::endgroup::'
           # Ignore "." and ".." to prevent errors when glob pattern for assets matches hidden files
