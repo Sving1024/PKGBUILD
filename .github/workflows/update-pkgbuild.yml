@@ -78,7 +78,7 @@ jobs:
   publish_to_aur:
     runs-on: ubuntu-latest
     container: archlinux
-    needs: [ update_oth_lang,prepare ]
+#    needs: [ update_oth_lang,prepare ]
     steps:
     -   name: instll deps
         run: |
