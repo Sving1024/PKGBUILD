@@ -1,4 +1,3 @@
-_url=https://ftp.mozilla.org/pub/firefox/nightly
 function publish(){
     echo $1
     echo $2
@@ -103,9 +102,7 @@ _languages=(
   'zh-TW  "Chinese (Traditional)"'
 )
 
-#for _lang in "${_languages[@]}"; do
-#    pwd
-#    eval "publish $_lang"
-#done
-
-publish ach
+for _lang in "${_languages[@]}"; do
+    pwd
+    eval "publish $_lang"
+done
