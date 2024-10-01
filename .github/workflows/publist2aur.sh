@@ -11,6 +11,7 @@ function publish(){
     read -r -a test_flags <<< "$TEST_FLAGS"
     commit_username="github-actions[bot]"
     commit_email='github-actions[bot]@users.noreply.github.com'
+    echo "$(cat ${pkgbuild} | grep pkgver)"
     eval "$(cat ${pkgbuild} | grep pkgver)"
     commit_message="update to ${cat $pkgbuild}"
     allow_empty_commits='false'
@@ -120,5 +121,5 @@ _languages=(
 
 for _lang in "${_languages[@]}"; do
     pwd
-    eval "update $_lang"
+    eval "publish $_lang"
 done

@@ -15,9 +15,9 @@ function update(){
         [date]="${_build_id_raw:0:8}"
         [time]="${_build_id_raw:8:6}"
     )
-    local pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})
     local _build_id_date=${_build_id[date]}
     local _build_id_time=${_build_id[time]}
+    local pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})
     echo "version=${_version}"
     echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})"
     mkdir -p ./tmp/firefox-nightly-i18n-$1
@@ -27,9 +27,9 @@ function update(){
         sed -i "s/_version=.*$/_version=${_version}/" PKGBUILD
         sed -i "s/_language=placeholder/_language=\"$2\"/" PKGBUILD
         sed -i "s/_language_short=placeholder/_language_short=$1/" PKGBUILD
-#        cat PKGBUILD
+        cat PKGBUILD
         updpkgsums
-        makepkg
+#        makepkg
     popd
     if [ ! -d ./firefox-nightly-i18n/$1/ ]; then
         mkdir -p ./firefox-nightly-i18n/$1/
