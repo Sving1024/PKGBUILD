@@ -97,7 +97,7 @@ jobs:
           echo '::group::Initializing SSH directory'
           mkdir -pv /home/builder/.ssh
           touch /home/builder/.ssh/known_hosts
-          cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
           chown -vR builder:builder /home/builder
           chmod -vR 600 /home/builder/.ssh/*
           echo '::endgroup::'
@@ -105,18 +105,18 @@ jobs:
           GLOBIGNORE=".:.."
 
           echo '::group::Adding aur.archlinux.org to known hosts'
-          ssh_keyscan_types='rsa,ecdsa,ed25519'
-          ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >> /home/builder/.ssh/known_hosts
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh ssh_keyscan_types='rsa,ecdsa,ed25519'
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh ssh-keyscan -v -t "$ssh_keyscan_types" aur.archlinux.org >> /home/builder/.ssh/known_hosts
           echo '::endgroup::'
 
           echo '::group::Importing private key'
-          echo "${{secrets.AUR_SSH_PRIVATE_KEY}}" > /home/builder/.ssh/aur
-          chmod -vR 600 /home/builder/.ssh/aur*
-          ssh-keygen -vy -f /home/builder/.ssh/aur > /home/builder/.ssh/aur.pub
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh echo "${{secrets.AUR_SSH_PRIVATE_KEY}}" > /home/builder/.ssh/aur
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh chmod -vR 600 /home/builder/.ssh/aur*
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh ssh-keygen -vy -f /home/builder/.ssh/aur > /home/builder/.ssh/aur.pub
           echo '::endgroup::'
 
           echo '::group::Checksums of SSH keys'
-          sha512sum /home/builder/.ssh/aur /home/builder/.ssh/aur.pub
+          sudo -Eu builder sh ./.github/workflows/publish2aur.sh sha512sum /home/builder/.ssh/aur /home/builder/.ssh/aur.pub
           echo '::endgroup::'
     -   uses: actions/download-artifact@v4
         with:

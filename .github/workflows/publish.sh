@@ -32,7 +32,7 @@ eval "$(cat ${pkgbuild} | grep pkgver)"
 commit_message="update to ${pkgver}"
 allow_empty_commits='false'
 force_push='false'
-post_process=''
+post_process='false'
 
 assert_non_empty() {
   name=$1
@@ -57,8 +57,7 @@ git config --global user.email "$commit_email"
 echo '::endgroup::'
 
 echo '::group::Cloning AUR package into /tmp/local-repo'
-#git clone -v "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
-git -c init.defaultBranch=master clone "ssh://aur@aur.archlinux.org/${pkgname}.git" /tmp/local-repo
+git clone -v "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
 echo '::endgroup::'
 
 echo '::group::Copying files into /tmp/local-repo'
@@ -126,18 +125,17 @@ esac
 echo '::endgroup::'
 
 echo '::group::Publishing the repository'
-git push
-#git remote add aur "ssh://aur@aur.archlinux.org/${pkgname}.git"
-#case "$force_push" in
-#true)
-#  git push -v --force aur master
-#  ;;
-#false)
-#  git push -v aur master
-#  ;;
-#*)
-#  echo "::error::Invalid Value: inputs.force_push is neither 'true' nor 'false': '$force_push'"
-#  exit 3
-#  ;;
-#esac
+git remote add aur "ssh://aur@aur.archlinux.org/${pkgname}.git"
+case "$force_push" in
+true)
+  git push -v --force aur master
+  ;;
+false)
+  git push -v aur master
+  ;;
+*)
+  echo "::error::Invalid Value: inputs.force_push is neither 'true' nor 'false': '$force_push'"
+  exit 3
+  ;;
+esac
 echo '::endgroup::'
