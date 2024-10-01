@@ -126,17 +126,18 @@ esac
 echo '::endgroup::'
 
 echo '::group::Publishing the repository'
+git push
 #git remote add aur "ssh://aur@aur.archlinux.org/${pkgname}.git"
-case "$force_push" in
-true)
-  git push -v --force aur master
-  ;;
-false)
-  git push -v aur master
-  ;;
-*)
-  echo "::error::Invalid Value: inputs.force_push is neither 'true' nor 'false': '$force_push'"
-  exit 3
-  ;;
-esac
+#case "$force_push" in
+#true)
+#  git push -v --force aur master
+#  ;;
+#false)
+#  git push -v aur master
+#  ;;
+#*)
+#  echo "::error::Invalid Value: inputs.force_push is neither 'true' nor 'false': '$force_push'"
+#  exit 3
+#  ;;
+#esac
 echo '::endgroup::'
