@@ -23,7 +23,7 @@ groups=('firefox-nightly-i18n')
 source=("${_pkgname_base}-${_language_short}-${pkgver}.xpi::$_url/firefox-${_version}.${_language_short}.langpack.xpi")
 
 # Don't extract anything
-noextract=("${_pkgname_base}-${_language_short}.xpi")
+noextract=("${_pkgname_base}-${_language_short}-${pkgver}.xpi")
 
 sha256sums=('66a55421d1c9d79c6c5814dec47ffd43109882aa99be9465dea396c19fcbd447')
 
