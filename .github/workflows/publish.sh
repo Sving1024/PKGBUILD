@@ -27,8 +27,8 @@ TEST_FLAGS='--clean --cleanbuild --nodeps'
 read -r -a test_flags <<< $TEST_FLAGS
 commit_username="github-actions[bot]"
 commit_email='github-actions[bot]@users.noreply.github.com'
-echo "$(cat ${pkgbuild} | grep pkgver)"
-eval "$(cat ${pkgbuild} | grep pkgver)"
+echo "$(cat ${pkgbuild} | grep pkgver=)"
+eval "$(cat ${pkgbuild} | grep pkgver=)"
 commit_message="update to ${pkgver}"
 allow_empty_commits='false'
 force_push='false'
