@@ -1,8 +1,9 @@
 name: Auto updating PKGBUILD
 on:
-  push:
   schedule:
     -  cron: '0 1,13 * * *'
+  workflow_dispatch:
+
 jobs:
   prepare:
     name: get new pkgver
