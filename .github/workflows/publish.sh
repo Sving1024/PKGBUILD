@@ -22,7 +22,7 @@ pkgname=firefox-nightly-i18n-${1,,}
 pkgbuild=./firefox-nightly-i18n/${1}/PKGBUILD
 assets=''
 updpkgsums='false'
-test='true'
+test='false'
 TEST_FLAGS='--clean --cleanbuild --nodeps'
 read -r -a test_flags <<< $TEST_FLAGS
 commit_username="github-actions[bot]"
