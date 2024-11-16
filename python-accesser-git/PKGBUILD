@@ -34,10 +34,8 @@ source=(
     "${_name}::git+https://github.com/URenko/Accesser.git"
     "accesser.service"
 )
-sha256sums=(
-    'SKIP'
-    '867bf31096eff1f35b4e7c2b60ad15f6fbe7df1264bcc9c8162d07d185cf22e7'
-)
+sha256sums=('SKIP'
+            'cb16c9771c4fbaf70b6b8f898475d8d024dd57ab385cfecfe364cb678dcbbabe')
 backup=(
     'etc/accesser/pac'
     'etc/accesser/config.toml'
