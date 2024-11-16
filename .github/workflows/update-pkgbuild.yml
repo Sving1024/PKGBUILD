@@ -110,6 +110,17 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux
     steps:
+    -   name: get language var
+        id: get_lang_val
+        run: |
+          echo_language_short(){
+            echo $1
+          }
+          echo_language(){
+            echo $2
+          }
+          echo "language_short=$(echo_language_short ${{matrix.lang}})" >> "${GITHUB_OUTPUT}"
+          echo "language=$(echo_language ${{matrix.lang}})" >> "${GITHUB_OUTPUT}"
     -   name: Install dependencies and update
         run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
     -   uses: actions/checkout@v4
@@ -123,12 +134,12 @@ jobs:
           pwd
     -   name: upd
         id: update
-        run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh ${{matrix.lang}} >> "${GITHUB_OUTPUT}"
+        run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh ${{matrix.lang}}
     -   uses: actions/upload-artifact@v4
         with:
-          name: ${{steps.update.outputs.language_short}}
+          name: ${{steps.get_lang_val.outputs.language_short}}
           path: |
-            ./firefox-nightly-i18n/${{steps.update.outputs.language_short}}/          
+            ./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/          
   prepare:
     name: get new pkgver
     runs-on: ubuntu-latest
