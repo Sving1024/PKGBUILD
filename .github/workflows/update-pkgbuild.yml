@@ -114,7 +114,7 @@ jobs:
         id: get_lang_val
         run: |
           echo_language_short(){
-            echo $1
+            echo ${1,,}
           }
           echo_language(){
             echo $2
@@ -208,31 +208,31 @@ jobs:
           de,
           dsb,
           el,
-          en-CA,
-          en-GB,
+          en-ca,
+          en-gb,
           eo,
-          es-AR,
-          es-CL,
-          es-ES,
-          es-MX,
+          es-ar,
+          es-cl,
+          es-es,
+          es-mx,
           et,
           eu,
           fa,
           ff,
           fi,
           fr,
-          fy-NL,
-          ga-IE,
+          fy-nl,
+          ga-ie,
           gd,
           gl,
           gn,
-          gu-IN,
+          gu-in,
           he,
-          hi-IN,
+          hi-in,
           hr,
           hsb,
           hu,
-          hy-AM,
+          hy-am,
           ia,
           id,
           is,
@@ -251,15 +251,15 @@ jobs:
           mr,
           ms,
           my,
-          nb-NO,
-          ne-NP,
+          nb-no,
+          ne-np,
           nl,
-          nn-NO,
+          nn-no,
           oc,
-          pa-IN,
+          pa-in,
           pl,
-          pt-BR,
-          pt-PT,
+          pt-br,
+          pt-pt,
           rm,
           ro,
           ru,
@@ -269,7 +269,7 @@ jobs:
           son,
           sq,
           sr,
-          sv-SE,
+          sv-se,
           ta,
           te,
           th,
@@ -281,8 +281,8 @@ jobs:
           uz,
           vi,
           xh,
-          zh-CN,
-          zh-TW
+          zh-cn,
+          zh-tw
         ]
     name: publish to aur
     runs-on: ubuntu-latest
@@ -291,18 +291,17 @@ jobs:
       -   uses: actions/download-artifact@v4
           with:
             name: ${{matrix.lang}}
-            path: firefox-nightly-i18n
       -   name: Cat PKGBUILD
-          run: cat firefox-nightly-i18n/PKGBUILD
+          run: cat firefox-nightly-i18n/${{matrix.lang}}/PKGBUILD
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
             pkgname: firefox-nightly-i18n-${{matrix.lang}}
-            test: true
+            test: false
             updpkgsums: false
             commit_username: "github-actions[bot]"
             commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
             allow_empty_commits: false
-            pkgbuild: firefox-nightly-i18n/${{matrix.lang}}/PKGBUILD
+            pkgbuild: ${{matrix.lang}}/PKGBUILD
