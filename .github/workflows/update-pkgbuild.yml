@@ -123,7 +123,7 @@ jobs:
           pwd
     -   name: upd
         id: update
-        run: sudo -Eu builder sh eval ./.github/workflows/update-pkgbuild-lang.sh ${{matrix.lang}}
+        run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh ${{matrix.lang}}
     -   uses: actions/upload-artifact@v4
         with:
           name: ${{steps.update.outputs.language_short}}
