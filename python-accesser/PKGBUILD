@@ -2,7 +2,7 @@
 _name=accesser
 pkgname=python-${_name}
 pkgver=0.10.0
-pkgrel=3
+pkgrel=4
 arch=('any')
 pkgdesc="A tool for solving SNI RST"
 url="https://github.com/URenko/Accesser"
@@ -35,10 +35,11 @@ source=(
     "accesser.service"
 )
 sha256sums=('b11965b1a52adf1fc55e313f08d6a38f224c21a4597833a04c3fe1f784cd4691'
-            'cb16c9771c4fbaf70b6b8f898475d8d024dd57ab385cfecfe364cb678dcbbabe')
+            'f943fdd6f112eb32a5630c60383470bcb344db66d0a116cdcbcc22f533815690')
 backup=(
     'etc/accesser/pac'
     'etc/accesser/config.toml'
+    'etc/accesser/rules.toml'
 )
 
 build() {
@@ -47,10 +48,11 @@ build() {
 }
 
 package() {
-    cd ${srcdir}/$_name-$pkgver
+    pushd ${srcdir}/$_name-$pkgver
     python -m installer --destdir="$pkgdir" dist/*.whl
     install -Dm644 "accesser/pac" "${pkgdir}/etc/accesser/pac"
     install -Dm644 "accesser/config.toml" "${pkgdir}/etc/accesser/config.toml"
-    cd ..
+    install -Dm644 "accesser/rules.toml" "${pkgdir}/etc/accesser/rules.toml"
+    popd
     install -Dm644 "accesser.service" "${pkgdir}/usr/lib/systemd/system/accesser.service"
 }

@@ -5,6 +5,130 @@ on:
   workflow_dispatch:
 
 jobs:
+  update_i18n_packages:
+    strategy:
+      max-parallel: 10
+      matrix:
+        lang: [
+          'ach    "Acholi"',
+          'af     "Afrikaans"',
+          'an     "Aragonese"',
+          'ar     "Arabic"',
+          'ast    "Asturian"',
+          'az     "Azerbaijani"',
+          'be     "Belarusian"',
+          'bg     "Bulgarian"',
+          'bn     "Bengali"',
+          'br     "Breton"',
+          'bs     "Bosnian"',
+          'ca-valencia "Catalan (Valencian)"',
+          'ca     "Catalan"',
+          'cak    "Maya Kaqchikel"',
+          'cs     "Czech"',
+          'cy     "Welsh"',
+          'da     "Danish"',
+          'de     "German"',
+          'dsb    "Lower Sorbian"',
+          'el     "Greek"',
+          'en-CA  "English (Canadian)"',
+          'en-GB  "English (British)"',
+          'eo     "Esperanto"',
+          'es-AR  "Spanish (Argentina)"',
+          'es-CL  "Spanish (Chile)"',
+          'es-ES  "Spanish (Spain)"',
+          'es-MX  "Spanish (Mexico)"',
+          'et     "Estonian"',
+          'eu     "Basque"',
+          'fa     "Persian"',
+          'ff     "Fulah"',
+          'fi     "Finnish"',
+          'fr     "French"',
+          'fy-NL  "Frisian"',
+          'ga-IE  "Irish"',
+          'gd     "Gaelic (Scotland)"',
+          'gl     "Galician"',
+          'gn     "Guarani"',
+          'gu-IN  "Gujarati (India)"',
+          'he     "Hebrew"',
+          'hi-IN  "Hindi (India)"',
+          'hr     "Croatian"',
+          'hsb    "Upper Sorbian"',
+          'hu     "Hungarian"',
+          'hy-AM  "Armenian"',
+          'ia     "Interlingua"',
+          'id     "Indonesian"',
+          'is     "Icelandic"',
+          'it     "Italian"',
+          'ja     "Japanese"',
+          'ka     "Georgian"',
+          'kab    "Kabyle"',
+          'kk     "Kazakh"',
+          'km     "Khmer"',
+          'kn     "Kannada"',
+          'ko     "Korean"',
+          'lij    "Ligurian"',
+          'lt     "Lithuanian"',
+          'lv     "Latvian"',
+          'mk     "Macedonian"',
+          'mr     "Marathi"',
+          'ms     "Malay"',
+          'my     "Burmese"',
+          'nb-NO  "Norwegian (Bokmål)"',
+          'ne-NP  "Nepali"',
+          'nl     "Dutch"',
+          'nn-NO  "Norwegian (Nynorsk)"',
+          'oc     "Occitan"',
+          'pa-IN  "Punjabi (India)"',
+          'pl     "Polish"',
+          'pt-BR  "Portuguese (Brazilian)"',
+          'pt-PT  "Portuguese (Portugal)"',
+          'rm     "Romansh"',
+          'ro     "Romanian"',
+          'ru     "Russian"',
+          'si     "Sinhala"',
+          'sk     "Slovak"',
+          'sl     "Slovenian"',
+          'son    "Songhai"',
+          'sq     "Albanian"',
+          'sr     "Serbian"',
+          'sv-SE  "Swedish"',
+          'ta     "Tamil"',
+          'te     "Telugu"',
+          'th     "Thai"',
+          'tl     "Tagalog"',
+          'tr     "Turkish"',
+          'trs    "Chicahuaxtla Triqui"',
+          'uk     "Ukrainian"',
+          'ur     "Urdu"',
+          'uz     "Uzbek"',
+          'vi     "Vietnamese"',
+          'xh     "Xhosa"',
+          'zh-CN  "Chinese (Simplified)"',
+          'zh-TW  "Chinese (Traditional)"'
+        ]
+    name: update pkgver of i18n packages
+    runs-on: ubuntu-latest
+    container: archlinux
+    steps:
+    -   name: Install dependencies and update
+        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
+    -   uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    -   name: create user for further steps
+        run: |
+          useradd builder -m
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod -R a+rw .
+          pwd
+    -   name: upd
+        id: update
+        run: sudo -Eu builder sh eval ./.github/workflows/update-pkgbuild-lang.sh ${{matrix.lang}}
+    -   uses: actions/upload-artifact@v4
+        with:
+          name: ${{steps.update.outputs.language_short}}
+          path: |
+            ./firefox-nightly-i18n/${{steps.update.outputs.language_short}}/          
   prepare:
     name: get new pkgver
     runs-on: ubuntu-latest
@@ -33,43 +157,15 @@ jobs:
           _build_id_time=${_build_id[time]}
           echo "version=${_version}" >> "${GITHUB_OUTPUT}"
           echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})" >> "${GITHUB_OUTPUT}"
-  update_oth_lang:
-    runs-on: ubuntu-latest
-    needs: prepare
-    container: archlinux
-    steps:
-      -   name: Install dependencies and update
-          run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
-      -   uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-      -   name: create user for further steps
-          run: |
-            useradd builder -m
-            echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-            chmod -R a+rw .
-            pwd
-      -   name: upd
-          run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh
-      -   name: debug
-          run: |
-            pwd
-            ls -laZ
-      -   uses: actions/upload-artifact@v4
-          with:
-            name: new_ver_of_PKGBUILD
-            path: |
-              firefox-nightly-i18n/
   push_updates:
     runs-on: ubuntu-latest
-    needs: [ prepare, update_oth_lang ]
+    needs: [ update_i18n_packages,prepare ]
     steps:
     -   uses: actions/checkout@v4
     -   name: remove old ver
         run: rm -rf firefox-nightly-i18n/*
     -   uses: actions/download-artifact@v4
         with:
-          name: new_ver_of_PKGBUILD
           path: firefox-nightly-i18n/
     -   uses: actions-js/push@v1.5
         with:
@@ -77,37 +173,125 @@ jobs:
           message: "update to ${{ needs.prepare.outputs.pkgver }}"
           branch: main
   publish_to_aur:
+    strategy:
+      max-parallel: 10
+      matrix:
+        lang: [
+          ach,
+          af,
+          an,
+          ar,
+          ast,
+          az,
+          be,
+          bg,
+          bn,
+          br,
+          bs,
+          ca-valencia,
+          ca,
+          cak,
+          cs,
+          cy,
+          da,
+          de,
+          dsb,
+          el,
+          en-CA,
+          en-GB,
+          eo,
+          es-AR,
+          es-CL,
+          es-ES,
+          es-MX,
+          et,
+          eu,
+          fa,
+          ff,
+          fi,
+          fr,
+          fy-NL,
+          ga-IE,
+          gd,
+          gl,
+          gn,
+          gu-IN,
+          he,
+          hi-IN,
+          hr,
+          hsb,
+          hu,
+          hy-AM,
+          ia,
+          id,
+          is,
+          it,
+          ja,
+          ka,
+          kab,
+          kk,
+          km,
+          kn,
+          ko,
+          lij,
+          lt,
+          lv,
+          mk,
+          mr,
+          ms,
+          my,
+          nb-NO,
+          ne-NP,
+          nl,
+          nn-NO,
+          oc,
+          pa-IN,
+          pl,
+          pt-BR,
+          pt-PT,
+          rm,
+          ro,
+          ru,
+          si,
+          sk,
+          sl,
+          son,
+          sq,
+          sr,
+          sv-SE,
+          ta,
+          te,
+          th,
+          tl,
+          tr,
+          trs,
+          uk,
+          ur,
+          uz,
+          vi,
+          xh,
+          zh-CN,
+          zh-TW
+        ]
+    name: publish to aur
     runs-on: ubuntu-latest
-    container: archlinux
-    needs: [ update_oth_lang,prepare ]
+    needs: [ update_i18n_packages,prepare ]
     steps:
-    -   name: instll deps
-        run: |
-          pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-    -   uses: actions/checkout@v4
-    -   name: config ssh
-        run: |
-          #!/bin/bash
-          set -o errexit -o pipefail -o nounset
-          echo '::group::Creating builder user'
-          useradd --create-home --shell /bin/bash builder
-          passwd --delete builder
-          mkdir -p /etc/sudoers.d/
-          echo "builder  ALL=(root) NOPASSWD:ALL" > /etc/sudoers.d/builder
-          echo '::endgroup::'
-          echo '::group::Initializing SSH directory'
-          mkdir -pv /home/builder/.ssh
-          touch /home/builder/.ssh/known_hosts
-          cp -v ./.github/workflows/ssh_config /home/builder/.ssh/config
-          chown -vR builder:builder /home/builder
-          chmod -vR 600 /home/builder/.ssh/*
-          echo '::endgroup::'
-          sudo -Eu builder sh ./.github/workflows/config_ssh.sh "${{secrets.AUR_SSH_PRIVATE_KEY}}"
-    -   name: rm old files
-        run: rm -rf ./firefox-nightly-i18n/
-    -   uses: actions/download-artifact@v4
-        with:
-          name: new_ver_of_PKGBUILD
-          path: firefox-nightly-i18n/
-    -   name: publish
-        run: sudo -Eu builder sh ./.github/workflows/publish2aur.sh
+      -   uses: actions/download-artifact@v4
+          with:
+            name: ${{matrix.lang}}
+            path: firefox-nightly-i18n
+      -   name: Cat PKGBUILD
+          run: cat firefox-nightly-i18n/PKGBUILD
+      -   name: Publish AUR package
+          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
+          with:
+            pkgname: firefox-nightly-i18n-${{matrix.lang}}
+            test: true
+            updpkgsums: false
+            commit_username: "github-actions[bot]"
+            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+            commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
+            allow_empty_commits: false
+            pkgbuild: firefox-nightly-i18n/${{matrix.lang}}/PKGBUILD
