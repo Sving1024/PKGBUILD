@@ -291,6 +291,12 @@ jobs:
       -   uses: actions/download-artifact@v4
           with:
             name: ${{matrix.lang}}
+            path: ${{matrix.lang}}
+      -   name: debug
+          run: |
+            ls
+            pwd
+            tree
       -   name: Cat PKGBUILD
           run: cat ${{matrix.lang}}/PKGBUILD
       -   name: Publish AUR package
