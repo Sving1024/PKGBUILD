@@ -1,4 +1,4 @@
-name: Auto updating PKGBUILD
+name: Publish packages to AUR
 on:
   push:
   workflow_dispatch:
