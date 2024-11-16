@@ -9,8 +9,6 @@ jobs:
       max-parallel: 10
       matrix:
         repo: [
-            python-accesser,
-            python-accesser-git,
             python-cyaron,
             python-cyaron-git,
             python-xeger,
@@ -34,3 +32,30 @@ jobs:
             commit_message: "git actions auto update"
             allow_empty_commits: false
             pkgbuild: ${{matrix.repo}}/PKGBUILD
+  publish_to_aur_accesser:
+    strategy:
+      max-parallel: 10
+      matrix:
+        repo: [
+            python-accesser,
+            python-accesser-git,
+        ]
+    name: publish to aur
+    runs-on: ubuntu-latest
+    steps:
+      -   uses: actions/checkout@v4
+      -   name: Cat PKGBUILD
+          run: cat ${{matrix.repo}}/PKGBUILD
+      -   name: Publish AUR package
+          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
+          with:
+            pkgname: ${{matrix.repo}}
+            test: false
+            updpkgsums: false
+            commit_username: "github-actions[bot]"
+            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+            commit_message: "git actions auto update"
+            allow_empty_commits: false
+            pkgbuild: ${{matrix.repo}}/PKGBUILD
+            assets: ${{matrix.repo}}/accesser.service
