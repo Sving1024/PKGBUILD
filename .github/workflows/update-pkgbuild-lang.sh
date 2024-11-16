@@ -1,6 +1,4 @@
 _url=https://ftp.mozilla.org/pub/firefox/nightly
-echo $1
-echo $2
 _version=$(curl ${_url}/latest-mozilla-central-l10n/linux-x86_64/xpi/ | grep "\.${1}.langpack.xpi" | sed "s/^.*>firefox-//; s/\.$1.*//" | sort -n | tail -n 1)
 _build_id_raw="$(curl -s "${_url}/latest-mozilla-central-l10n/firefox-${_version}.$1.linux-x86_64.checksums" | grep '.partial.mar' | cut -d' ' -f4 | grep -E -o '[[:digit:]]{14}' | sort | tail -n1)"
 declare -A _build_id
@@ -17,8 +15,6 @@ _build_id=(
 _build_id_date=${_build_id[date]}
 _build_id_time=${_build_id[time]}
 pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})
-echo "version=${_version}" >> "$GITHUB_OUTPUT"
-echo "pkgver=${pkgver}" >> "$GITHUB_OUTPUT"
 mkdir -p ./tmp/firefox-nightly-i18n-$1
 cp firefox-nightly-i18n-base/PKGBUILD ./tmp/firefox-nightly-i18n-$1/PKGBUILD
 pushd ./tmp/firefox-nightly-i18n-$1
@@ -39,6 +35,6 @@ fi
 mv ./tmp/firefox-nightly-i18n-$1/PKGBUILD ./firefox-nightly-i18n/$1/PKGBUILD
 rm -rf ./tmp/firefox-nightly-i18n-$1
 
-echo "pkgname=firefox-nightly-i18n-$1" >> "$GITHUB_OUTPUT"
-echo "language=$2" >> "$GITHUB_OUTPUT"
-echo "language_short=$1" >> "$GITHUB_OUTPUT"
+echo "pkgname=firefox-nightly-i18n-$1" 
+echo "language=$2"
+echo "language_short=$1"
