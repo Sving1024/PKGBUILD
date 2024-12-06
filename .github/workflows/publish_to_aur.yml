@@ -60,4 +60,6 @@ jobs:
             commit_message: "git actions auto update"
             allow_empty_commits: false
             pkgbuild: ${{matrix.repo}}/PKGBUILD
-            assets: ${{matrix.repo}}/accesser.service
+            assets: |
+              ${{matrix.repo}}/accesser.service
+              ${{matrix.repo}}/${{matrix.repo}}.install
