@@ -24,7 +24,7 @@ jobs:
       -   name: Get the latest commit message\
           id: MSG
           run: |
-            echo "commit_msg=$(git log -1 --format='%s'"  -- ${{matrix.repo}}/) >> "$GITHUB_OUTPUT"
+            echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
@@ -55,7 +55,7 @@ jobs:
       -   name: Get the latest commit message\
           id: MSG
           run: |
-            echo "commit_msg=$(git log -1 --format='%s'"  -- ${{matrix.repo}}/) >> "$GITHUB_OUTPUT"
+            echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
