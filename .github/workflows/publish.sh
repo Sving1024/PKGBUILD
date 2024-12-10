@@ -56,45 +56,47 @@ git config --global user.name "$commit_username"
 git config --global user.email "$commit_email"
 echo '::endgroup::'
 
-echo '::group::Cloning AUR package into /tmp/local-repo'
-git clone -v "https://aur.archlinux.org/${pkgname}.git" /tmp/local-repo
+repo_path=/tmp/local-repo-${pkgname}
+
+echo "::group::Cloning AUR package into ${repo_path}"
+git clone -v "https://aur.archlinux.org/${pkgname}.git" $repo_path
 echo '::endgroup::'
 
-echo '::group::Copying files into /tmp/local-repo'
+echo "::group::Copying files into $repo_path"
 {
   echo "Copying $pkgbuild"
-  cp -r "$pkgbuild" /tmp/local-repo/
+  cp -r "$pkgbuild" $repo_path
 }
 # shellcheck disable=SC2086
 # Ignore quote rule because we need to expand glob patterns to copy $assets
 if [[ -n "$assets" ]]; then
   echo 'Copying' $assets
-  cp -rt /tmp/local-repo/ $assets
+  cp -rt $repo_path $assets
 fi
 echo '::endgroup::'
 
 if [ "$updpkgsums" == "true" ]; then
 	echo '::group::Updating checksums'
-	cd /tmp/local-repo/
+	cd $repo_path
 	updpkgsums
 	echo '::endgroup::'
 fi
 
 if [ "$test" == "true" ]; then
 	echo '::group::Building package with makepkg'
-	cd /tmp/local-repo/
+	cd $repo_path
 	makepkg "${test_flags[@]}"
 	echo '::endgroup::'
 fi
 
 echo '::group::Generating .SRCINFO'
-cd /tmp/local-repo
+cd $repo_path
 makepkg --printsrcinfo >.SRCINFO
 echo '::endgroup::'
 
 if [ -n "$post_process" ]; then
 	echo '::group::Executing post process commands'
-	cd /tmp/local-repo/
+	cd $repo_path
   eval "$post_process"
 	echo '::endgroup::'
 fi
@@ -140,4 +142,4 @@ false)
 esac
 echo '::endgroup::'
 
-rm -rf /tmp/local-repo
+rm -rf $repo_path
