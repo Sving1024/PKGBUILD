@@ -6,7 +6,6 @@ on:
 jobs:
   publish_to_aur:
     strategy:
-      max-parallel: 10
       fail-fast: false
       matrix:
         repo: [
@@ -19,6 +18,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -   uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
       -   name: Cat PKGBUILD
           run: cat ${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
@@ -39,7 +40,6 @@ jobs:
             pkgbuild: ${{matrix.repo}}/PKGBUILD
   publish_to_aur_accesser:
     strategy:
-      max-parallel: 10
       fail-fast: false
       matrix:
         repo: [
@@ -50,6 +50,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       -   uses: actions/checkout@v4
+          with: 
+            fetch-depth: 0
       -   name: Cat PKGBUILD
           run: cat ${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
