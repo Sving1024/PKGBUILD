@@ -1,4 +1,4 @@
-name: Auto updating PKGBUILD
+name: Auto updating PKGBUILD - Parallel Uploading
 on:
   workflow_dispatch:
 

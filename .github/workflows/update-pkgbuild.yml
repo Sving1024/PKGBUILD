@@ -1,4 +1,4 @@
-name: Auto updating PKGBUILD
+name: Auto updating PKGBUILD - Serial uploading
 on:
   schedule:
     -  cron: '0 2,14 * * *'
