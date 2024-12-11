@@ -1,7 +1,7 @@
 name: Auto updating PKGBUILD
 on:
   schedule:
-    -  cron: '0 1,13 * * *'
+    -  cron: '0 2,14 * * *'
   workflow_dispatch:
 
 jobs:
