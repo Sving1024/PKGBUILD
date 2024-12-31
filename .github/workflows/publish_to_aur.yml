@@ -20,14 +20,17 @@ jobs:
       -   uses: actions/checkout@v4
           with:
             fetch-depth: 0
+            path: 'PKGBUILD'
       -   name: Cat PKGBUILD
-          run: cat ${{matrix.repo}}/PKGBUILD
+          run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
+          working-directory: PKGBUILD
           id: MSG
           run: |
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
       -   name: Get pkgver
           id: pkgver
+          working-directory: PKGBUILD
           run: |
             curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
             eval $(cat PKGBUILD.old | grep pkgver=)
@@ -49,13 +52,12 @@ jobs:
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             commit_message: ${{steps.MSG.outputs.commit_msg}}
             allow_empty_commits: false
-            pkgbuild: ${{matrix.repo}}/PKGBUILD
+            pkgbuild: PKGUILD/${{matrix.repo}}/PKGBUILD
       - uses: actions/checkout@v4
         with: 
           repository: 'vifly/arch-build'
-          path: 'repo'
         if: steps.pkgver.outputs.need_rebuild != 0
-      - uses: ./repo/build-aur-action
+      - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repo }}
           if: steps.pkgver.outputs.need_rebuild != 0
@@ -79,14 +81,17 @@ jobs:
       -   uses: actions/checkout@v4
           with: 
             fetch-depth: 0
+            path: 'PKGBUILD'
       -   name: Cat PKGBUILD
-          run: cat ${{matrix.repo}}/PKGBUILD
+          run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
           id: MSG
+          working-directory: PKGBUILD
           run: |
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
       -   name: Get pkgver
           id: pkgver
+          working-directory: PKGBUILD
           run: |
             curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
             eval $(cat PKGBUILD.old | grep pkgver=)
@@ -107,16 +112,15 @@ jobs:
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             commit_message: ${{steps.MSG.outputs.commit_msg}}
             allow_empty_commits: false
-            pkgbuild: ${{matrix.repo}}/PKGBUILD
+            pkgbuild:  PKGBUILD/${{matrix.repo}}/PKGBUILD
             assets: |
-              ${{matrix.repo}}/accesser.service
-              ${{matrix.repo}}/${{matrix.repo}}.install
+              PKGBUILD/${{matrix.repo}}/accesser.service
+              PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
       - uses: actions/checkout@v4
         with: 
           repository: 'vifly/arch-build'
-          path: 'repo'
         if: steps.pkgver.outputs.need_rebuild != 0
-      - uses: ./repo/build-aur-action
+      - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repo }}
         if: steps.pkgver.outputs.need_rebuild != 0
@@ -137,7 +141,6 @@ jobs:
       - uses: actions/checkout@v4
         with: 
           repository: 'vifly/arch-build'
-          path: 'repo'
       
       - uses: actions/download-artifact@v4
         id: download
@@ -145,7 +148,7 @@ jobs:
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
       
-      - uses: ./repo/create-db-and-upload-action
+      - uses: ./create-db-and-upload-action
         with:
           RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
           RCLONE_CONFIG_NAME: ${{matrix.remote}}

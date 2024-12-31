@@ -17,7 +17,6 @@ jobs:
     - uses: actions/checkout@v4
       with: 
         repository: 'vifly/arch-build'
-        path: 'repo'
     - name: show dir structure
       run: |
         ls -R
