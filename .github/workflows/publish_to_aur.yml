@@ -52,7 +52,7 @@ jobs:
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             commit_message: ${{steps.MSG.outputs.commit_msg}}
             allow_empty_commits: false
-            pkgbuild: PKGUILD/${{matrix.repo}}/PKGBUILD
+            pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
       - uses: actions/checkout@v4
         with: 
           repository: 'vifly/arch-build'
