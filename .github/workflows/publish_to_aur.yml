@@ -24,14 +24,15 @@ jobs:
       -   name: Cat PKGBUILD
           run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
-          working-directory: PKGBUILD
           id: MSG
           run: |
+            cd PKGBUILD
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+            cd ..
       -   name: Get pkgver
           id: pkgver
-          working-directory: PKGBUILD
           run: |
+            cd PKGBUILD
             curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
             eval $(cat PKGBUILD.old | grep pkgver=)
             eval $(cat PKGBUILD.old | grep pkgrel=)
@@ -40,7 +41,7 @@ jobs:
             eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
             ver_new=$pkgver-$pkgrel
             echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
-
+            cd ..
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
@@ -88,11 +89,14 @@ jobs:
           id: MSG
           working-directory: PKGBUILD
           run: |
+            cd PKGBUILD
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+            cd ..
       -   name: Get pkgver
           id: pkgver
           working-directory: PKGBUILD
           run: |
+            cd PKGBUILD
             curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
             eval $(cat PKGBUILD.old | grep pkgver=)
             eval $(cat PKGBUILD.old | grep pkgrel=)
@@ -101,6 +105,7 @@ jobs:
             eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
             ver_new=$pkgver-$pkgrel
             echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
+            cd ..
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
@@ -135,7 +140,7 @@ jobs:
       matrix:
         remote: [ onedrive, r2 ]
     runs-on: ubuntu-latest
-    if: always()
+    if: 
     needs: [publish_to_aur,publish_to_aur_accesser]
     steps:
       - uses: actions/checkout@v4

@@ -236,7 +236,6 @@ jobs:
       matrix:
         remote: [ onedrive, r2 ]
     runs-on: ubuntu-latest
-    if: always()
     needs: [buildAUR]
 
     steps:
