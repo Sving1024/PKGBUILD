@@ -152,8 +152,10 @@ jobs:
         id: need_upload
         run: |
           if [ "$(find ./ -type f -name "*.tar.zst")" == "" ]; then
+            echo "need_upload=0" >> $GITHUB_OUTPUT
             echo "need_upload=0"
           else
+            echo "need_upload=1" >> $GITHUB_OUTPUT
             echo "need_upload=1"
           fi
 
