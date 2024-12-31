@@ -26,6 +26,18 @@ jobs:
           id: MSG
           run: |
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+      -   name: Get pkgver
+          id: pkgver
+          run: |
+            curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
+            eval $(cat PKGBUILD.old | grep pkgver=)
+            eval $(cat PKGBUILD.old | grep pkgrel=)
+            ver_old=$pkgver-$pkgrel
+            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
+            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
+            ver_new=$pkgver-$pkgrel
+            echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
+
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
@@ -38,6 +50,21 @@ jobs:
             commit_message: ${{steps.MSG.outputs.commit_msg}}
             allow_empty_commits: false
             pkgbuild: ${{matrix.repo}}/PKGBUILD
+      - uses: actions/checkout@v4
+        with: 
+          repository: 'vifly/arch-build'
+          path: 'repo'
+        if: steps.pkgver.outputs.need_rebuild != 0
+      - uses: ./repo/build-aur-action
+        with:
+          repo-name: ${{ matrix.repo }}
+          if: steps.pkgver.outputs.need_rebuild != 0
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ./*/*.pkg.tar.zst
+          name: ${{ matrix.repo }}
+          if-no-files-found: error
+        if: steps.pkgver.outputs.need_rebuild != 0
   publish_to_aur_accesser:
     strategy:
       fail-fast: false
@@ -58,6 +85,17 @@ jobs:
           id: MSG
           run: |
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+      -   name: Get pkgver
+          id: pkgver
+          run: |
+            curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
+            eval $(cat PKGBUILD.old | grep pkgver=)
+            eval $(cat PKGBUILD.old | grep pkgrel=)
+            ver_old=$pkgver-$pkgrel
+            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
+            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
+            ver_new=$pkgver-$pkgrel
+            echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
       -   name: Publish AUR package
           uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
           with:
@@ -73,3 +111,45 @@ jobs:
             assets: |
               ${{matrix.repo}}/accesser.service
               ${{matrix.repo}}/${{matrix.repo}}.install
+      - uses: actions/checkout@v4
+        with: 
+          repository: 'vifly/arch-build'
+          path: 'repo'
+        if: steps.pkgver.outputs.need_rebuild != 0
+      - uses: ./repo/build-aur-action
+        with:
+          repo-name: ${{ matrix.repo }}
+        if: steps.pkgver.outputs.need_rebuild != 0
+      - uses: actions/upload-artifact@v4
+        with:
+          path: ./*/*.pkg.tar.zst
+          name: ${{ matrix.repo }}
+          if-no-files-found: error
+        if: steps.pkgver.outputs.need_rebuild != 0
+  uploadToRemote:
+    strategy:
+      matrix:
+        remote: [ onedrive, r2 ]
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [publish_to_aur,publish_to_aur_accesser]
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          repository: 'vifly/arch-build'
+          path: 'repo'
+      
+      - uses: actions/download-artifact@v4
+        id: download
+
+      - name: Display structure of downloaded files
+        run: ls -R ${{ steps.download.outputs.download-path }}
+      
+      - uses: ./repo/create-db-and-upload-action
+        with:
+          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
+          RCLONE_CONFIG_NAME: ${{matrix.remote}}
+          dest_path: /repo/archlinux/
+          repo_name: archlinux-sving1024
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          local_path: ${{ steps.download.outputs.download-path }}
