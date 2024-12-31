@@ -87,14 +87,12 @@ jobs:
           run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
       -   name: Get the latest commit message\
           id: MSG
-          working-directory: PKGBUILD
           run: |
             cd PKGBUILD
             echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
             cd ..
       -   name: Get pkgver
           id: pkgver
-          working-directory: PKGBUILD
           run: |
             cd PKGBUILD
             curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
