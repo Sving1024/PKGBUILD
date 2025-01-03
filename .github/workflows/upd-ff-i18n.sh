@@ -30,11 +30,11 @@ pushd ./tmp/firefox-nightly-i18n-$1
     updpkgsums
 #        makepkg
 popd
-if [ ! -d ./firefox-nightly-i18n/$1/ ]; then
-    mkdir -p ./firefox-nightly-i18n/$1/
+if [ ! -d ./firefox-nightly-i18n/${1,,}/ ]; then
+    mkdir -p ./firefox-nightly-i18n/${1,,}/
 fi
-if [ ! -f ./firefox-nightly-i18n/$1/PKGBUILD ]; then
-    rm ./firefox-nightly-i18n/$1/PKGBUILD
+if [ ! -f ./firefox-nightly-i18n/${1,,}/PKGBUILD ]; then
+    rm ./firefox-nightly-i18n/${1,,}/PKGBUILD
 fi
-mv ./tmp/firefox-nightly-i18n-$1/PKGBUILD ./firefox-nightly-i18n/$1/PKGBUILD
+mv ./tmp/firefox-nightly-i18n-$1/PKGBUILD ./firefox-nightly-i18n/${1,,}/PKGBUILD
 rm -rf ./tmp/firefox-nightly-i18n-$1
