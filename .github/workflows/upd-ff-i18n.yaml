@@ -134,7 +134,7 @@ jobs:
           pwd
     -   name: upd
         id: update
-        run: sudo -Eu builder sh upd-ff-i18n.sh ${{matrix.lang}}
+        run: sudo -Eu builder sh ./.github/workflows/upd-ff-i18n.sh ${{matrix.lang}}
     -   uses: actions/upload-artifact@v4
         with:
           name: ${{steps.get_lang_val.outputs.language_short}}
