@@ -3,9 +3,9 @@ PKGBUILDs in AUR.
 
 Using GitHub actions to auto-update the pkgver and sha256sum, and build Arch packages.
 
-Thanks vifly for his [arch-build](https://github.com/vifly/arch-build) actions. If you want to build a repo like this, you can read [his post](https://viflythink.com/Use_GitHubActions_to_build_AUR/).
+If you don't want to build the packages yourself, you can try my repostries.
 
-# Usage
+## Add my repostry
 The packages are located at OneDrive and Cloudflare R2 Storage, choose one of you like.
 
 Add the following code snippet to your `/etc/pacman.conf`:
@@ -31,4 +31,4 @@ Now you can use `sudo pacman -S <pkg_name>` to install packages from my reposito
 
 You may also want to use [archlinuxcn](https://github.com/archlinuxcn/repo) with the repo together. Some of the dependencies are provided in the repo.
 
-If you don't want to build the packages yourself, you can try [my repostries](https://github.com/Sving1024/arch-repo).
+Thanks vifly for his [arch-build](https://github.com/vifly/arch-build) project. If you want to build a repo like this, you can read [his post](https://viflythink.com/Use_GitHubActions_to_build_AUR/).
