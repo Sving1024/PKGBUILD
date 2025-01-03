@@ -1,7 +1,5 @@
 name: Auto updating PKGBUILD - Serial uploading
 on:
-  schedule:
-    -  cron: '0 2,14 * * *'
   workflow_dispatch:
 
 jobs:
@@ -50,7 +48,7 @@ jobs:
             chmod -R a+rw .
             pwd
       -   name: upd
-          run: sudo -Eu builder sh ./.github/workflows/update-pkgbuild-lang.sh
+          run: sudo -Eu builder sh ./.github/workflows/upd-ff-i18n-all.sh
       -   name: debug
           run: |
             pwd

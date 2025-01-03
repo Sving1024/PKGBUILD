@@ -1,9 +1,3 @@
-function publish(){
-    echo $1
-    echo $2
-    ./.github/workflows/publish.sh $1
-}
-
 _languages=(
   'ach    "Acholi"'
   'af     "Afrikaans"'
@@ -104,5 +98,5 @@ _languages=(
 
 for _lang in "${_languages[@]}"; do
     pwd
-    eval "publish $_lang"
+    eval "./.github/workflows/publish.sh $_lang"
 done
