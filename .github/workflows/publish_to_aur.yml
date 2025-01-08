@@ -16,6 +16,7 @@ jobs:
         ]
     name: publish to aur
     runs-on: ubuntu-latest
+    container: archlinux
     steps:
       -   uses: actions/checkout@v4
           with:
@@ -78,6 +79,7 @@ jobs:
         ]
     name: publish to aur
     runs-on: ubuntu-latest
+    container: archlinux
     steps:
       -   uses: actions/checkout@v4
           with: 
