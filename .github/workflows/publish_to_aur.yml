@@ -140,7 +140,7 @@ jobs:
       matrix:
         remote: [ onedrive, r2 ]
     runs-on: ubuntu-latest
-    if: 
+    if: always()
     needs: [publish_to_aur,publish_to_aur_accesser]
     steps:
       - uses: actions/checkout@v4

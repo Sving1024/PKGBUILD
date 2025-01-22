@@ -439,6 +439,7 @@ jobs:
         remote: [ onedrive, r2 ]
     runs-on: ubuntu-latest
     needs: [buildAUR]
+    if: always()
 
     steps:
       - uses: actions/checkout@v4
