@@ -5,7 +5,7 @@ Using GitHub actions to auto-update the pkgver and sha256sum, and build Arch pac
 
 If you don't want to build the packages yourself, you can try my repostries.
 
-## Add my repostry
+## Add my repositry
 The packages are located at OneDrive and Cloudflare R2 Storage, choose one of you like.
 
 Add the following code snippet to your `/etc/pacman.conf`:
