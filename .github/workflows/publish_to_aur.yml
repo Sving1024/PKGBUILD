@@ -51,9 +51,6 @@ jobs:
           commit_message: ${{steps.MSG.outputs.commit_msg}}
           allow_empty_commits: false
           pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
-          assets: |
-            PKGBUILD/${{matrix.repo}}/accesser.service
-            PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
       - uses: actions/checkout@v4
         with:
           repository: 'vifly/arch-build'
