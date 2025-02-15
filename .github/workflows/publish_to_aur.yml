@@ -2,61 +2,60 @@ name: Publish packages to AUR
 on:
   push:
   workflow_dispatch:
-
 jobs:
   publish_to_aur:
     strategy:
       fail-fast: false
       matrix:
-        repo: [
-            python-cyaron,
-            python-cyaron-git,
-            python-xeger,
-            python-xeger-git
-        ]
+        repo: [python-cyaron, python-cyaron-git, python-xeger, python-xeger-git]
     name: publish to aur
     runs-on: ubuntu-latest
     container: archlinux
     steps:
-      -   uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-            path: 'PKGBUILD'
-      -   name: Cat PKGBUILD
-          run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
-      -   name: Get the latest commit message\
-          id: MSG
-          run: |
-            cd PKGBUILD
-            echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
-            cd ..
-      -   name: Get pkgver
-          id: pkgver
-          run: |
-            cd PKGBUILD
-            curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
-            eval $(cat PKGBUILD.old | grep pkgver=)
-            eval $(cat PKGBUILD.old | grep pkgrel=)
-            ver_old=$pkgver-$pkgrel
-            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
-            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
-            ver_new=$pkgver-$pkgrel
-            echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
-            cd ..
-      -   name: Publish AUR package
-          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
-          with:
-            pkgname: ${{matrix.repo}}
-            test: false
-            updpkgsums: false
-            commit_username: "github-actions[bot]"
-            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-            commit_message: ${{steps.MSG.outputs.commit_msg}}
-            allow_empty_commits: false
-            pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
+      - name: Install depends
+        run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
       - uses: actions/checkout@v4
-        with: 
+        with:
+          fetch-depth: 0
+          path: 'PKGBUILD'
+      - name: Cat PKGBUILD
+        run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
+      - name: Get the latest commit message\
+        id: MSG
+        run: |
+          cd PKGBUILD
+          echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+          cd ..
+      - name: Get pkgver
+        id: pkgver
+        run: |
+          cd PKGBUILD
+          curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
+          eval $(cat PKGBUILD.old | grep pkgver=)
+          eval $(cat PKGBUILD.old | grep pkgrel=)
+          ver_old=$pkgver-$pkgrel
+          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
+          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
+          ver_new=$pkgver-$pkgrel
+          echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
+          cd ..
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        with:
+          pkgname: ${{matrix.repo}}
+          test: false
+          updpkgsums: false
+          commit_username: "github-actions[bot]"
+          commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{steps.MSG.outputs.commit_msg}}
+          allow_empty_commits: false
+          pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
+          assets: |
+            PKGBUILD/${{matrix.repo}}/accesser.service
+            PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
+      - uses: actions/checkout@v4
+        with:
           repository: 'vifly/arch-build'
         if: steps.pkgver.outputs.need_rebuild != 0
       - uses: ./build-aur-action
@@ -73,58 +72,55 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repo: [
-            python-accesser,
-            python-accesser-git,
-        ]
+        repo: [python-accesser, python-accesser-git]
     name: publish to aur
     runs-on: ubuntu-latest
     container: archlinux
     steps:
-      -   name: Install depends
-          run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      -   uses: actions/checkout@v4
-          with: 
-            fetch-depth: 0
-            path: 'PKGBUILD'
-      -   name: Cat PKGBUILD
-          run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
-      -   name: Get the latest commit message\
-          id: MSG
-          run: |
-            cd PKGBUILD
-            echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
-            cd ..
-      -   name: Get pkgver
-          id: pkgver
-          run: |
-            cd PKGBUILD
-            curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
-            eval $(cat PKGBUILD.old | grep pkgver=)
-            eval $(cat PKGBUILD.old | grep pkgrel=)
-            ver_old=$pkgver-$pkgrel
-            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
-            eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
-            ver_new=$pkgver-$pkgrel
-            echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
-            cd ..
-      -   name: Publish AUR package
-          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
-          with:
-            pkgname: ${{matrix.repo}}
-            test: false
-            updpkgsums: false
-            commit_username: "github-actions[bot]"
-            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-            commit_message: ${{steps.MSG.outputs.commit_msg}}
-            allow_empty_commits: false
-            pkgbuild:  PKGBUILD/${{matrix.repo}}/PKGBUILD
-            assets: |
-              PKGBUILD/${{matrix.repo}}/accesser.service
-              PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
+      - name: Install depends
+        run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
       - uses: actions/checkout@v4
-        with: 
+        with:
+          fetch-depth: 0
+          path: 'PKGBUILD'
+      - name: Cat PKGBUILD
+        run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
+      - name: Get the latest commit message\
+        id: MSG
+        run: |
+          cd PKGBUILD
+          echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+          cd ..
+      - name: Get pkgver
+        id: pkgver
+        run: |
+          cd PKGBUILD
+          curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
+          eval $(cat PKGBUILD.old | grep pkgver=)
+          eval $(cat PKGBUILD.old | grep pkgrel=)
+          ver_old=$pkgver-$pkgrel
+          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
+          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
+          ver_new=$pkgver-$pkgrel
+          echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
+          cd ..
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        with:
+          pkgname: ${{matrix.repo}}
+          test: false
+          updpkgsums: false
+          commit_username: "github-actions[bot]"
+          commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: ${{steps.MSG.outputs.commit_msg}}
+          allow_empty_commits: false
+          pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
+          assets: |
+            PKGBUILD/${{matrix.repo}}/accesser.service
+            PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
+      - uses: actions/checkout@v4
+        with:
           repository: 'vifly/arch-build'
         if: steps.pkgver.outputs.need_rebuild != 0
       - uses: ./build-aur-action
@@ -140,18 +136,16 @@ jobs:
   uploadToRemote:
     strategy:
       matrix:
-        remote: [ onedrive, r2 ]
+        remote: [onedrive, r2]
     runs-on: ubuntu-latest
     if: always()
-    needs: [publish_to_aur,publish_to_aur_accesser]
+    needs: [publish_to_aur, publish_to_aur_accesser]
     steps:
       - uses: actions/checkout@v4
-        with: 
+        with:
           repository: 'vifly/arch-build'
-      
       - uses: actions/download-artifact@v4
         id: download
-
       - name: need_upload
         id: need_upload
         run: |
@@ -162,10 +156,8 @@ jobs:
             echo "need_upload=1" >> $GITHUB_OUTPUT
             echo "need_upload=1"
           fi
-
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
-      
       - uses: ./create-db-and-upload-action
         if: steps.need_upload.outputs.need_upload == 1
         with:
