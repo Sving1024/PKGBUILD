@@ -1,6 +1,6 @@
 # Maintainer: Sving1024 <sving1024@outlook.com>
 _name=dnsstamps
-pkgname=python-${_name}
+pkgname=python-${_name}-git
 pkgver=1.4.0
 pkgrel=1
 pkgdesc="Create and parse DNS stamps with ease."
