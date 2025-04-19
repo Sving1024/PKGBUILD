@@ -5,16 +5,424 @@ on:
   workflow_dispatch:
 
 jobs:
-  buildAUR:
+  update_i18n_packages:
     strategy:
-        matrix:
-            repos: [
-                firefox-nightly-bin,
-            ]
-        fail-fast: false
-    
+      max-parallel: 10
+      matrix:
+        lang: [
+          'ach    "Acholi"',
+          'af     "Afrikaans"',
+          'an     "Aragonese"',
+          'ar     "Arabic"',
+          'ast    "Asturian"',
+          'az     "Azerbaijani"',
+          'be     "Belarusian"',
+          'bg     "Bulgarian"',
+          'bn     "Bengali"',
+          'br     "Breton"',
+          'bs     "Bosnian"',
+          'ca-valencia "Catalan (Valencian)"',
+          'ca     "Catalan"',
+          'cak    "Maya Kaqchikel"',
+          'cs     "Czech"',
+          'cy     "Welsh"',
+          'da     "Danish"',
+          'de     "German"',
+          'dsb    "Lower Sorbian"',
+          'el     "Greek"',
+          'en-CA  "English (Canadian)"',
+          'en-GB  "English (British)"',
+          'eo     "Esperanto"',
+          'es-AR  "Spanish (Argentina)"',
+          'es-CL  "Spanish (Chile)"',
+          'es-ES  "Spanish (Spain)"',
+          'es-MX  "Spanish (Mexico)"',
+          'et     "Estonian"',
+          'eu     "Basque"',
+          'fa     "Persian"',
+          'ff     "Fulah"',
+          'fi     "Finnish"',
+          'fr     "French"',
+          'fy-NL  "Frisian"',
+          'ga-IE  "Irish"',
+          'gd     "Gaelic (Scotland)"',
+          'gl     "Galician"',
+          'gn     "Guarani"',
+          'gu-IN  "Gujarati (India)"',
+          'he     "Hebrew"',
+          'hi-IN  "Hindi (India)"',
+          'hr     "Croatian"',
+          'hsb    "Upper Sorbian"',
+          'hu     "Hungarian"',
+          'hy-AM  "Armenian"',
+          'ia     "Interlingua"',
+          'id     "Indonesian"',
+          'is     "Icelandic"',
+          'it     "Italian"',
+          'ja     "Japanese"',
+          'ka     "Georgian"',
+          'kab    "Kabyle"',
+          'kk     "Kazakh"',
+          'km     "Khmer"',
+          'kn     "Kannada"',
+          'ko     "Korean"',
+          'lij    "Ligurian"',
+          'lt     "Lithuanian"',
+          'lv     "Latvian"',
+          'mk     "Macedonian"',
+          'mr     "Marathi"',
+          'ms     "Malay"',
+          'my     "Burmese"',
+          'nb-NO  "Norwegian (Bokmål)"',
+          'ne-NP  "Nepali"',
+          'nl     "Dutch"',
+          'nn-NO  "Norwegian (Nynorsk)"',
+          'oc     "Occitan"',
+          'pa-IN  "Punjabi (India)"',
+          'pl     "Polish"',
+          'pt-BR  "Portuguese (Brazilian)"',
+          'pt-PT  "Portuguese (Portugal)"',
+          'rm     "Romansh"',
+          'ro     "Romanian"',
+          'ru     "Russian"',
+          'si     "Sinhala"',
+          'sk     "Slovak"',
+          'sl     "Slovenian"',
+          'son    "Songhai"',
+          'sq     "Albanian"',
+          'sr     "Serbian"',
+          'sv-SE  "Swedish"',
+          'ta     "Tamil"',
+          'te     "Telugu"',
+          'th     "Thai"',
+          'tl     "Tagalog"',
+          'tr     "Turkish"',
+          'trs    "Chicahuaxtla Triqui"',
+          'uk     "Ukrainian"',
+          'ur     "Urdu"',
+          'uz     "Uzbek"',
+          'vi     "Vietnamese"',
+          'xh     "Xhosa"',
+          'zh-CN  "Chinese (Simplified)"',
+          'zh-TW  "Chinese (Traditional)"'
+        ]
+    name: update pkgver of i18n packages
     runs-on: ubuntu-latest
+    container: archlinux
     steps:
+    -   name: get language var
+        id: get_lang_val
+        run: |
+          echo_language_short(){
+            echo ${1,,}
+          }
+          echo_language(){
+            echo $2
+          }
+          echo "language_short=$(echo_language_short ${{matrix.lang}})" >> "${GITHUB_OUTPUT}"
+          echo "language=$(echo_language ${{matrix.lang}})" >> "${GITHUB_OUTPUT}"
+    -   name: Install dependencies and update
+        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
+    -   uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+    -   name: create user for further steps
+        run: |
+          useradd builder -m
+          echo "builder ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+          chmod -R a+rw .
+          pwd
+    -   name: upd
+        id: update
+        run: sudo -Eu builder sh ./.github/workflows/upd-ff-i18n.sh ${{matrix.lang}}
+    -   uses: actions/upload-artifact@v4
+        with:
+          name: ${{steps.get_lang_val.outputs.language_short}}
+          path: |
+            ./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/          
+  prepare:
+    name: get new pkgver
+    runs-on: ubuntu-latest
+    outputs:
+      pkgver: ${{ steps.get-new-pkgver.outputs.pkgver }}
+      version: ${{ steps.get-new-pkgver.outputs.version }}
+    steps:
+    -   name: get new pkgver
+        id: get-new-pkgver
+        run: |
+          _url=https://ftp.mozilla.org/pub/firefox/nightly
+          _version=$(curl "${CURL_OPTS[@]}" ${_url}/latest-mozilla-central-l10n/linux-x86_64/xpi/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
+          _build_id_raw="$(curl -s "${_url}/latest-mozilla-central-l10n/firefox-${_version}.ach.linux-x86_64.checksums" | grep '.partial.mar' | cut -d' ' -f4 | grep -E -o '[[:digit:]]{14}' | sort | tail -n1)"
+          declare -A _build_id
+          _build_id=(
+            [year]="${_build_id_raw:0:4}"
+            [month]="${_build_id_raw:4:2}"
+            [day]="${_build_id_raw:6:2}"
+            [hour]="${_build_id_raw:8:2}"
+            [min]="${_build_id_raw:10:2}"
+            [sec]="${_build_id_raw:12:2}"
+            [date]="${_build_id_raw:0:8}"
+            [time]="${_build_id_raw:8:6}"
+          )
+          _build_id_date=${_build_id[date]}
+          _build_id_time=${_build_id[time]}
+          echo "version=${_version}" >> "${GITHUB_OUTPUT}"
+          echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})" >> "${GITHUB_OUTPUT}"
+  push_updates:
+    runs-on: ubuntu-latest
+    needs: [ update_i18n_packages,prepare ]
+    steps:
+    -   uses: actions/checkout@v4
+    -   name: remove old ver
+        run: rm -rf firefox-nightly-i18n/*
+    -   uses: actions/download-artifact@v4
+        with:
+          path: firefox-nightly-i18n/
+    -   uses: actions-js/push@v1.5
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          message: "update to ${{ needs.prepare.outputs.pkgver }}"
+          branch: main
+  publish_to_aur:
+    strategy:
+      max-parallel: 10
+      fail-fast: false
+      matrix:
+        lang: [
+          ach,
+          af,
+          an,
+          ar,
+          ast,
+          az,
+          be,
+          bg,
+          bn,
+          br,
+          bs,
+          ca-valencia,
+          ca,
+          cak,
+          cs,
+          cy,
+          da,
+          de,
+          dsb,
+          el,
+          en-ca,
+          en-gb,
+          eo,
+          es-ar,
+          es-cl,
+          es-es,
+          es-mx,
+          et,
+          eu,
+          fa,
+          ff,
+          fi,
+          fr,
+          fy-nl,
+          ga-ie,
+          gd,
+          gl,
+          gn,
+          gu-in,
+          he,
+          hi-in,
+          hr,
+          hsb,
+          hu,
+          hy-am,
+          ia,
+          id,
+          is,
+          it,
+          ja,
+          ka,
+          kab,
+          kk,
+          km,
+          kn,
+          ko,
+          lij,
+          lt,
+          lv,
+          mk,
+          mr,
+          ms,
+          my,
+          nb-no,
+          ne-np,
+          nl,
+          nn-no,
+          oc,
+          pa-in,
+          pl,
+          pt-br,
+          pt-pt,
+          rm,
+          ro,
+          ru,
+          si,
+          sk,
+          sl,
+          son,
+          sq,
+          sr,
+          sv-se,
+          ta,
+          te,
+          th,
+          tl,
+          tr,
+          trs,
+          uk,
+          ur,
+          uz,
+          vi,
+          xh,
+          zh-cn,
+          zh-tw
+        ]
+    name: publish to aur
+    runs-on: ubuntu-latest
+    needs: [ update_i18n_packages,prepare ]
+    steps:
+      -   uses: actions/download-artifact@v4
+          with:
+            name: ${{matrix.lang}}
+            path: ${{matrix.lang}}
+      -   name: debug
+          run: |
+            ls
+            pwd
+            tree
+      -   name: Cat PKGBUILD
+          run: cat ${{matrix.lang}}/PKGBUILD
+      -   name: Publish AUR package
+          uses: KSXGitHub/github-actions-deploy-aur@v3.0.1   
+          with:
+            pkgname: firefox-nightly-i18n-${{matrix.lang}}
+            test: false
+            updpkgsums: false
+            commit_username: "github-actions[bot]"
+            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+            commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
+            allow_empty_commits: false
+            pkgbuild: ${{matrix.lang}}/PKGBUILD
+  buildAUR:
+      needs: publish_to_aur
+      strategy:
+        matrix:
+          repos: [
+            firefox-nightly-i18n-ach,
+            firefox-nightly-i18n-af,
+            firefox-nightly-i18n-an,
+            firefox-nightly-i18n-ar,
+            firefox-nightly-i18n-ast,
+            firefox-nightly-i18n-az,
+            firefox-nightly-i18n-be,
+            firefox-nightly-i18n-bg,
+            firefox-nightly-i18n-bn,
+            firefox-nightly-i18n-br,
+            firefox-nightly-i18n-bs,
+            firefox-nightly-i18n-ca-valencia,
+            firefox-nightly-i18n-ca,
+            firefox-nightly-i18n-cak,
+            firefox-nightly-i18n-cs,
+            firefox-nightly-i18n-cy,
+            firefox-nightly-i18n-da,
+            firefox-nightly-i18n-de,
+            firefox-nightly-i18n-dsb,
+            firefox-nightly-i18n-el,
+            firefox-nightly-i18n-en-ca,
+            firefox-nightly-i18n-en-gb,
+            firefox-nightly-i18n-eo,
+            firefox-nightly-i18n-es-ar,
+            firefox-nightly-i18n-es-cl,
+            firefox-nightly-i18n-es-es,
+            firefox-nightly-i18n-es-mx,
+            firefox-nightly-i18n-et,
+            firefox-nightly-i18n-eu,
+            firefox-nightly-i18n-fa,
+            firefox-nightly-i18n-ff,
+            firefox-nightly-i18n-fi,
+            firefox-nightly-i18n-fr,
+            firefox-nightly-i18n-fy-nl,
+            firefox-nightly-i18n-ga-ie,
+            firefox-nightly-i18n-gd,
+            firefox-nightly-i18n-gl,
+            firefox-nightly-i18n-gn,
+            firefox-nightly-i18n-gu-in,
+            firefox-nightly-i18n-he,
+            firefox-nightly-i18n-hi-in,
+            firefox-nightly-i18n-hr,
+            firefox-nightly-i18n-hsb,
+            firefox-nightly-i18n-hu,
+            firefox-nightly-i18n-hy-am,
+            firefox-nightly-i18n-ia,
+            firefox-nightly-i18n-id,
+            firefox-nightly-i18n-is,
+            firefox-nightly-i18n-it,
+            firefox-nightly-i18n-ja,
+            firefox-nightly-i18n-ka,
+            firefox-nightly-i18n-kab,
+            firefox-nightly-i18n-kk,
+            firefox-nightly-i18n-km,
+            firefox-nightly-i18n-kn,
+            firefox-nightly-i18n-ko,
+            firefox-nightly-i18n-lij,
+            firefox-nightly-i18n-lt,
+            firefox-nightly-i18n-lv,
+            firefox-nightly-i18n-mk,
+            firefox-nightly-i18n-mr,
+            firefox-nightly-i18n-ms,
+            firefox-nightly-i18n-my,
+            firefox-nightly-i18n-nb-no,
+            firefox-nightly-i18n-ne-np,
+            firefox-nightly-i18n-nl,
+            firefox-nightly-i18n-nn-no,
+            firefox-nightly-i18n-oc,
+            firefox-nightly-i18n-pa-in,
+            firefox-nightly-i18n-pl,
+            firefox-nightly-i18n-pt-br,
+            firefox-nightly-i18n-pt-pt,
+            firefox-nightly-i18n-rm,
+            firefox-nightly-i18n-ro,
+            firefox-nightly-i18n-ru,
+            firefox-nightly-i18n-si,
+            firefox-nightly-i18n-sk,
+            firefox-nightly-i18n-sl,
+            firefox-nightly-i18n-son,
+            firefox-nightly-i18n-sq,
+            firefox-nightly-i18n-sr,
+            firefox-nightly-i18n-sv-se,
+            firefox-nightly-i18n-ta,
+            firefox-nightly-i18n-te,
+            firefox-nightly-i18n-th,
+            firefox-nightly-i18n-tl,
+            firefox-nightly-i18n-tr,
+            firefox-nightly-i18n-trs,
+            firefox-nightly-i18n-uk,
+            firefox-nightly-i18n-ur,
+            firefox-nightly-i18n-uz,
+            firefox-nightly-i18n-vi,
+            firefox-nightly-i18n-xh,
+            firefox-nightly-i18n-zh-cn,
+            firefox-nightly-i18n-zh-tw,
+            firefox-nightly-bin,
+            visual-studio-code-insiders-bin,
+            python-accesser-git,
+            python-cyaron-git, 
+            python-xeger-git
+          ]
+        fail-fast: false
+        
+      runs-on: ubuntu-latest
+      if: always()
+      steps:
       - uses: actions/checkout@v4
         with: 
           repository: 'vifly/arch-build'
@@ -28,9 +436,37 @@ jobs:
       - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repos }}
-    
+      
       - uses: actions/upload-artifact@v4
         with:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repos }}
           if-no-files-found: error
+  uploadToRemote:
+    strategy:
+      matrix:
+        remote: [ onedrive, r2 ]
+    runs-on: ubuntu-latest
+    needs: [buildAUR]
+    if: always()
+
+    steps:
+      - uses: actions/checkout@v4
+        with: 
+          repository: 'vifly/arch-build'
+      
+      - uses: actions/download-artifact@v4
+        id: download
+
+      - name: Display structure of downloaded files
+        run: ls -R ${{ steps.download.outputs.download-path }}
+      
+      - uses: ./create-db-and-upload-action
+        with:
+          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
+          RCLONE_CONFIG_NAME: ${{matrix.remote}}
+          dest_path: /repo/archlinux/
+          repo_name: archlinux-sving1024
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          local_path: ${{ steps.download.outputs.download-path }}
+      
