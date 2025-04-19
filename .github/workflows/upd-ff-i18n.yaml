@@ -22,7 +22,7 @@ jobs:
         run: |
           sed -i '22i mkdir -p /home/builder/.gnupg' ./build-aur-action/entrypoint.sh
           sed -i '23i sudo --set-home -u builder echo "keyserver hkps://keys.openpgp.org" > /home/builder/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
-          sed -i '24i chown -R builder:builder' ./build-aur-action/entrypoint.sh
+          sed -i '24i chown -R builder:builder /home/builder/.gnupg' ./build-aur-action/entrypoint.sh
           sed -i '25i cat /home/builder/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
           cat ./build-aur-action/entrypoint.sh
       - uses: ./build-aur-action
