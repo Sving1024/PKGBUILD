@@ -20,9 +20,9 @@ jobs:
           repository: 'vifly/arch-build'
       - name: configure pgp server
         run: |
-          sed -i '22i mkdir -p /github/home/.gnupg/' ./build-aur-action/entrypoint.sh
-          sed -i '23i sudo --set-home -u builder echo "keyserver hkps://keys.openpgp.org" > ~/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
-          sed -i '24i cat /github/home/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
+          sed -i '22i mkdir -p /home/builder/.gnupg' ./build-aur-action/entrypoint.sh
+          sed -i '23i sudo --set-home -u builder echo "keyserver hkps://keys.openpgp.org" > /home/builder/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
+          sed -i '24i cat /home/builder/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
           cat ./build-aur-action/entrypoint.sh
       - uses: ./build-aur-action
         with:
