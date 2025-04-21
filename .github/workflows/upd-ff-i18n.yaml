@@ -428,7 +428,7 @@ jobs:
           repository: 'vifly/arch-build'
       - name: configure pgp server
         run: |
-          sed -i '22i sudo --set-home -u builder "gpg --keyserver hkps://keys.openpgp.org --recv-keys 14F26682D0916CDD81E37B6D61B7B526D98F0353"' ./build-aur-action/entrypoint.sh
+          sed -i '22i sudo --set-home -u builder gpg --keyserver hkps://keys.openpgp.org --recv-keys 14F26682D0916CDD81E37B6D61B7B526D98F0353' ./build-aur-action/entrypoint.sh
 #          sed -i '22i mkdir -p /home/builder/.gnupg' ./build-aur-action/entrypoint.sh
 #          sed -i '23i sudo --set-home -u builder echo "keyserver hkps://keys.openpgp.org" > /home/builder/.gnupg/gpg.conf' ./build-aur-action/entrypoint.sh
 #          sed -i '24i chown -R builder:builder /home/builder/.gnupg' ./build-aur-action/entrypoint.sh
