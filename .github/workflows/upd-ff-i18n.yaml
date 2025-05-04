@@ -473,7 +473,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     if: always()
-    needs: [publish_to_aur]
+    needs: [buildAUR]
     steps:
       - uses: actions/checkout@v4
         with:
