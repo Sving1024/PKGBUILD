@@ -470,4 +470,21 @@ jobs:
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           local_path: ${{ steps.download.outputs.download-path }}
-      
+  release:
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [publish_to_aur]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: 'vifly/arch-build'
+      - uses: actions/download-artifact@v4
+        id: download
+      - name: Display structure of downloaded files
+        run: ls -R ${{ steps.download.outputs.download-path }}
+      - uses: ncipollo/release-action@v1.16.0
+        with:
+          allowUpdates: true
+          tag: "packages"
+          artifacts: "./upload_packages/*.sig,./upload_packages/*.files,./upload_packages/*.db,./upload_packages/*.tar.gz"
+          token: ${{ secrets.GITHUB_TOKEN }}
