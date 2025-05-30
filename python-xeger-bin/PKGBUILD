@@ -3,7 +3,7 @@
 # Maintainer: Sving1024 <sving1024@outlook.com>
 
 _name=xeger
-pkgname=python-xeger
+pkgname=python-xeger-bin
 pkgver=0.4.0
 pkgrel=1
 pkgdesc="A library for generating random strings from a valid regular expression."
