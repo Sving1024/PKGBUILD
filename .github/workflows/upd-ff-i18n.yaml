@@ -474,5 +474,5 @@ jobs:
         with:
           allowUpdates: true
           tag: "packages"
-          artifacts: "./upload_packages/*.sig,./upload_packages/*.files,./upload_packages/*.db,./upload_packages/*.tar.gz"
+          artifacts: "./upload_packages/*.sig,./upload_packages/*.files,./upload_packages/*.db,./upload_packages/*.tar.gz,./upload_packages/*.tar.zst"
           token: ${{ secrets.GITHUB_TOKEN }}
