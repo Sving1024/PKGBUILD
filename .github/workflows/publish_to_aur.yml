@@ -134,6 +134,8 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     needs: [publish_to_aur, publish_to_aur_accesser]
+    outputs: 
+      need_upload: ${{steps.need_upload.outputs.need_upload}}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -170,7 +172,7 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{Create_database.outputs.need_upload}}
     needs: [Create_database]
     steps:
       - uses: actions/checkout@v4
@@ -180,16 +182,6 @@ jobs:
         id: download
         with:
           name: database
-      - name: need_upload
-        id: need_upload
-        run: |
-          if [ "$(find ./ -type f -name "*.tar.zst")" == "" ]; then
-            echo "need_upload=0" >> $GITHUB_OUTPUT
-            echo "need_upload=0"
-          else
-            echo "need_upload=1" >> $GITHUB_OUTPUT
-            echo "need_upload=1"
-          fi
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
       - uses: ./upload
@@ -202,7 +194,7 @@ jobs:
           local_path: ${{ steps.download.outputs.download-path }}
   Release:
     runs-on: ubuntu-latest
-    if: always()
+    if: ${{Create_database.outputs.need_upload}}
     needs: [Create_database]
     steps:
       - uses: actions/download-artifact@v4
