@@ -480,7 +480,8 @@ jobs:
           repository: 'Sving1024/arch-repo'
       - uses: actions/download-artifact@v4
         id: download
-        name: database
+        with:
+          name: database
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
       - uses: ./upload
@@ -496,8 +497,9 @@ jobs:
     needs: [Create_database]
     steps:
       - uses: actions/download-artifact@v4
+        with:
+          name: database
         id: download
-        name: database
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
       - uses: ncipollo/release-action@v1.16.0

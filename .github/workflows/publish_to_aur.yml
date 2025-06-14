@@ -178,7 +178,8 @@ jobs:
           repository: 'Sving1024/arch-repo'
       - uses: actions/download-artifact@v4
         id: download
-        name: database
+        with:
+          name: database
       - name: need_upload
         id: need_upload
         run: |
@@ -206,7 +207,8 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         id: download
-        name: database
+        with:
+          name: database
       - name: need_upload
         id: need_upload
         run: |
