@@ -446,7 +446,7 @@ jobs:
   Create_database:
     runs-on: ubuntu-latest
     if: always()
-    needs: [publish_to_aur, publish_to_aur_accesser]
+    needs: [buildAUR]
     steps:
       - uses: actions/checkout@v4
         with:
