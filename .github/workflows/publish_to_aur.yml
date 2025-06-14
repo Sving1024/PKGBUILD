@@ -169,6 +169,7 @@ jobs:
           path: upload_packages
   uploadToRemote:
     strategy:
+      fail-fast: false
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest

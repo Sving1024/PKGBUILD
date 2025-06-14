@@ -443,7 +443,7 @@ jobs:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repos }}
           if-no-files-found: error
-  Create_database:
+  create_database:
     runs-on: ubuntu-latest
     if: always()
     needs: [buildAUR]
@@ -469,11 +469,12 @@ jobs:
           path: upload_packages
   uploadToRemote:
     strategy:
+      fail-fast: false
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
     if: always()
-    needs: [Create_database]
+    needs: [create_database]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -494,7 +495,7 @@ jobs:
   Release:
     runs-on: ubuntu-latest
     if: always()
-    needs: [Create_database]
+    needs: [create_database]
     steps:
       - uses: actions/download-artifact@v4
         with:
