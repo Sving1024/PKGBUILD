@@ -130,7 +130,7 @@ jobs:
           name: ${{ matrix.repo }}
           if-no-files-found: error
         if: steps.pkgver.outputs.need_rebuild != 0
-  Create_database:
+  create_database:
     runs-on: ubuntu-latest
     if: always()
     needs: [publish_to_aur, publish_to_aur_accesser]
@@ -172,8 +172,8 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
-    if: ${{Create_database.outputs.need_upload}}
-    needs: [Create_database]
+    if: ${{needs.create_database.outputs.need_upload}}
+    needs: [create_database]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -194,8 +194,8 @@ jobs:
           local_path: ${{ steps.download.outputs.download-path }}
   Release:
     runs-on: ubuntu-latest
-    if: ${{Create_database.outputs.need_upload}}
-    needs: [Create_database]
+    if: ${{needs.create_database.outputs.need_upload}}
+    needs: [create_database]
     steps:
       - uses: actions/download-artifact@v4
         id: download
