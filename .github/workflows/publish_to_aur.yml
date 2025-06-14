@@ -173,7 +173,7 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
-    if: ${{needs.create_database.outputs.need_upload}}
+    if: ${{needs.create_database.outputs.need_upload}} != 0
     needs: [create_database]
     steps:
       - uses: actions/checkout@v4
@@ -194,7 +194,7 @@ jobs:
           local_path: ${{ steps.download.outputs.download-path }}
   Release:
     runs-on: ubuntu-latest
-    if: ${{needs.create_database.outputs.need_upload}}
+    if: ${{needs.create_database.outputs.need_upload}} != 0
     needs: [create_database]
     steps:
       - uses: actions/download-artifact@v4
