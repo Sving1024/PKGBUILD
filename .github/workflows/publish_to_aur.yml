@@ -131,6 +131,8 @@ jobs:
           if-no-files-found: error
         if: steps.pkgver.outputs.need_rebuild != 0
   Create_database:
+    runs-on: ubuntu-latest
+    if: always()
     needs: [publish_to_aur, publish_to_aur_accesser]
     steps:
       - uses: actions/checkout@v4
@@ -199,6 +201,8 @@ jobs:
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           local_path: ${{ steps.download.outputs.download-path }}
   Release:
+    runs-on: ubuntu-latest
+    if: always()
     needs: [Create_database]
     steps:
       - uses: actions/download-artifact@v4
