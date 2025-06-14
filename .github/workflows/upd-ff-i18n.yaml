@@ -489,7 +489,6 @@ jobs:
           RCLONE_CONFIG_NAME: ${{matrix.remote}}
           dest_path: /repo/archlinux/
           repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
           local_path: ${{ steps.download.outputs.download-path }}
   Release:
     runs-on: ubuntu-latest
