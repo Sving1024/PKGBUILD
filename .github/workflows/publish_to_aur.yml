@@ -130,17 +130,12 @@ jobs:
           name: ${{ matrix.repo }}
           if-no-files-found: error
         if: steps.pkgver.outputs.need_rebuild != 0
-  uploadToRemote:
-    strategy:
-      matrix:
-        remote: [onedrive, r2]
-    runs-on: ubuntu-latest
-    if: always()
+  Create_database:
     needs: [publish_to_aur, publish_to_aur_accesser]
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: 'vifly/arch-build'
+          repository: 'Sving1024/arch-repo'
       - uses: actions/download-artifact@v4
         id: download
       - name: need_upload
@@ -155,7 +150,46 @@ jobs:
           fi
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
-      - uses: ./create-db-and-upload-action
+      - uses: ./create-db
+        if: steps.need_upload.outputs.need_upload == 1
+        with:
+          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
+          RCLONE_CONFIG_NAME: r2
+          dest_path: /repo/archlinux/
+          repo_name: archlinux-sving1024
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          local_path: ${{ steps.download.outputs.download-path }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: database
+          path: upload_packages
+  uploadToRemote:
+    strategy:
+      matrix:
+        remote: [onedrive, r2]
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [Create_database]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: 'Sving1024/arch-repo'
+      - uses: actions/download-artifact@v4
+        id: download
+        name: database
+      - name: need_upload
+        id: need_upload
+        run: |
+          if [ "$(find ./ -type f -name "*.tar.zst")" == "" ]; then
+            echo "need_upload=0" >> $GITHUB_OUTPUT
+            echo "need_upload=0"
+          else
+            echo "need_upload=1" >> $GITHUB_OUTPUT
+            echo "need_upload=1"
+          fi
+      - name: Display structure of downloaded files
+        run: ls -R ${{ steps.download.outputs.download-path }}
+      - uses: ./upload
         if: steps.need_upload.outputs.need_upload == 1
         with:
           RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
@@ -164,6 +198,24 @@ jobs:
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           local_path: ${{ steps.download.outputs.download-path }}
+  Release:
+    needs: [Create_database]
+    steps:
+      - uses: actions/download-artifact@v4
+        id: download
+        name: database
+      - name: need_upload
+        id: need_upload
+        run: |
+          if [ "$(find ./ -type f -name "*.tar.zst")" == "" ]; then
+            echo "need_upload=0" >> $GITHUB_OUTPUT
+            echo "need_upload=0"
+          else
+            echo "need_upload=1" >> $GITHUB_OUTPUT
+            echo "need_upload=1"
+          fi
+      - name: Display structure of downloaded files
+        run: ls -R ${{ steps.download.outputs.download-path }}
       - uses: ncipollo/release-action@v1.16.0
         if: steps.need_upload.outputs.need_upload == 1
         with:
