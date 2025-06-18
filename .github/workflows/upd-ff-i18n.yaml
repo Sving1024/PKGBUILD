@@ -500,6 +500,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: database
+          path: upload_packages
         id: download
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}

@@ -201,6 +201,7 @@ jobs:
         id: download
         with:
           name: database
+          path: upload_packages
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
       - uses: ncipollo/release-action@v1.16.0
