@@ -1,14 +1,14 @@
-name: Publish packages to AUR
+name: Rebuild All Packages.
 on:
   push:
   workflow_dispatch:
 jobs:
-  publish_to_aur:
+  rebuild:
     strategy:
       fail-fast: false
       matrix:
         repo: [python-cyaron, python-cyaron-git, python-xeger-bin, python-xeger-git, python-dnsstamps, python-dnsstamps-git]
-    name: publish to aur
+    name: Rebuild
     runs-on: ubuntu-latest
     container: archlinux
     steps:
@@ -26,51 +26,23 @@ jobs:
           cd PKGBUILD
           echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
           cd ..
-      - name: Get pkgver
-        id: pkgver
-        run: |
-          cd PKGBUILD
-          curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
-          eval $(cat PKGBUILD.old | grep pkgver=)
-          eval $(cat PKGBUILD.old | grep pkgrel=)
-          ver_old=$pkgver-$pkgrel
-          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
-          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
-          ver_new=$pkgver-$pkgrel
-          echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
-          cd ..
-      - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
-        with:
-          pkgname: ${{matrix.repo}}
-          test: false
-          updpkgsums: false
-          commit_username: "github-actions[bot]"
-          commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: ${{steps.MSG.outputs.commit_msg}}
-          allow_empty_commits: false
-          pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
       - uses: actions/checkout@v4
         with:
           repository: 'vifly/arch-build'
-        if: steps.pkgver.outputs.need_rebuild != 0
       - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repo }}
-        if: steps.pkgver.outputs.need_rebuild != 0
       - uses: actions/upload-artifact@v4
         with:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repo }}
           if-no-files-found: error
-        if: steps.pkgver.outputs.need_rebuild != 0
-  publish_to_aur_accesser:
+  rebuild_accesser:
     strategy:
       fail-fast: false
       matrix:
         repo: [python-accesser, python-accesser-git]
-    name: publish to aur
+    name: Rebuild
     runs-on: ubuntu-latest
     container: archlinux
     steps:
@@ -82,58 +54,21 @@ jobs:
           path: 'PKGBUILD'
       - name: Cat PKGBUILD
         run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
-      - name: Get the latest commit message\
-        id: MSG
-        run: |
-          cd PKGBUILD
-          echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
-          cd ..
-      - name: Get pkgver
-        id: pkgver
-        run: |
-          cd PKGBUILD
-          curl https://aur.archlinux.org/cgit/aur.git/plain/PKGBUILD?h=${{matrix.repo}} -o PKGBUILD.old
-          eval $(cat PKGBUILD.old | grep pkgver=)
-          eval $(cat PKGBUILD.old | grep pkgrel=)
-          ver_old=$pkgver-$pkgrel
-          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgver=)
-          eval $(cat ${{matrix.repo}}/PKGBUILD | grep pkgrel=)
-          ver_new=$pkgver-$pkgrel
-          echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
-          cd ..
-      - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
-        with:
-          pkgname: ${{matrix.repo}}
-          test: false
-          updpkgsums: false
-          commit_username: "github-actions[bot]"
-          commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: ${{steps.MSG.outputs.commit_msg}}
-          allow_empty_commits: false
-          pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
-          assets: |
-            PKGBUILD/${{matrix.repo}}/accesser.service
-            PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
       - uses: actions/checkout@v4
         with:
           repository: 'vifly/arch-build'
-        if: steps.pkgver.outputs.need_rebuild != 0
       - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repo }}
-        if: steps.pkgver.outputs.need_rebuild != 0
       - uses: actions/upload-artifact@v4
         with:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repo }}
           if-no-files-found: error
-        if: steps.pkgver.outputs.need_rebuild != 0
   create_database:
     runs-on: ubuntu-latest
     if: always()
-    needs: [publish_to_aur, publish_to_aur_accesser]
+    needs: [rebuild_accesser, rebuild]
     outputs: 
       need_upload: ${{steps.check.outputs.need_upload}}
     steps:
