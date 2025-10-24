@@ -1,6 +1,5 @@
 name: Rebuild All Packages.
 on:
-  push:
   workflow_dispatch:
 jobs:
   rebuild:
@@ -108,7 +107,6 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
-    if: always()
     if: needs.create_database.outputs.need_upload == 1
     steps:
       - uses: actions/checkout@v4
