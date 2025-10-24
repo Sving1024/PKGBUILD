@@ -6,7 +6,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repo: [python-cyaron, python-cyaron-git, python-xeger-bin, python-xeger-git, python-dnsstamps, python-dnsstamps-git]
+        repo: [python-cyaron, python-cyaron-git, python-xeger-bin, python-xeger-git, python-dnsstamps, python-dnsstamps-git, python-accesser, python-accesser-git]
     name: Rebuild
     runs-on: ubuntu-latest
     container: archlinux
@@ -36,39 +36,11 @@ jobs:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repo }}
           if-no-files-found: error
-  rebuild_accesser:
-    strategy:
-      fail-fast: false
-      matrix:
-        repo: [python-accesser, python-accesser-git]
-    name: Rebuild
-    runs-on: ubuntu-latest
-    container: archlinux
-    steps:
-      - name: Install depends
-        run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          path: 'PKGBUILD'
-      - name: Cat PKGBUILD
-        run: cat PKGBUILD/${{matrix.repo}}/PKGBUILD
-      - uses: actions/checkout@v4
-        with:
-          repository: 'vifly/arch-build'
-      - uses: ./build-aur-action
-        with:
-          repo-name: ${{ matrix.repo }}
-      - uses: actions/upload-artifact@v4
-        with:
-          path: ./*/*.pkg.tar.zst
-          name: ${{ matrix.repo }}
-          if-no-files-found: error
   create_database:
     runs-on: ubuntu-latest
     if: always()
-    needs: [rebuild_accesser, rebuild]
-    outputs: 
+    needs: [rebuild]
+    outputs:
       need_upload: ${{steps.check.outputs.need_upload}}
     steps:
       - uses: actions/checkout@v4
@@ -108,7 +80,7 @@ jobs:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
     needs: [create_database]
-    if: needs.create_database.outputs.need_upload == 1
+    if: needs.create_database.outputs.need_upload == 1 && always()
     steps:
       - uses: actions/checkout@v4
         with:
