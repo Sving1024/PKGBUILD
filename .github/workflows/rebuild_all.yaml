@@ -107,6 +107,7 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
+    needs: [create_database]
     if: needs.create_database.outputs.need_upload == 1
     steps:
       - uses: actions/checkout@v4
