@@ -173,6 +173,7 @@ jobs:
       matrix:
         remote: [onedrive, r2]
     runs-on: ubuntu-latest
+    if: always()
     needs: [create_database]
     if: needs.create_database.outputs.need_upload != 0
     steps:
