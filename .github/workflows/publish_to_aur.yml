@@ -34,7 +34,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repo: [python-cyaron, python-xeger-bin, python-dnsstamps]
+        repo: [python-cyaron, python-xeger-bin, python-dnsstamps, ac-library]
     name: publish to aur
     runs-on: ubuntu-latest
     container: archlinux
