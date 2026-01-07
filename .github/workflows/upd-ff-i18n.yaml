@@ -195,21 +195,3 @@ jobs:
           dest_path: /repo/archlinux/
           repo_name: archlinux-sving1024
           local_path: ${{ steps.download.outputs.download-path }}
-  Release:
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [create_database]
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: database
-          path: upload_packages
-        id: download
-      - name: Display structure of downloaded files
-        run: ls -R ${{ steps.download.outputs.download-path }}
-      - uses: ncipollo/release-action@v1.16.0
-        with:
-          allowUpdates: true
-          tag: "packages"
-          artifacts: "./upload_packages/*.sig,./upload_packages/*.files,./upload_packages/*.db,./upload_packages/*.tar.gz"
-          token: ${{ secrets.GITHUB_TOKEN }}
