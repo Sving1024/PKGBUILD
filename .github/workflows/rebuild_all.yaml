@@ -71,6 +71,7 @@ jobs:
       - name: Download existing database
         if: steps.check.outputs.need_upload == 1
         run: |
+          mkdir old_repo
           rclone copy r2:/repo/archlinux/ ./old_repo/  --create-empty-src-dirs
       - uses: ./create-db
         if: steps.check.outputs.need_upload == 1
