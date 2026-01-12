@@ -67,7 +67,7 @@ jobs:
         if: steps.check.outputs.need_upload == 1
         uses: AnimMouse/setup-rclone@v1.12.0
         with:
-          rclone_config: ${{secrets.RCLONE_CONFIG}}
+          rclone_config: ${{secrets.RCLONE_CONFIG_BASE64}}
       - name: Download existing database
         if: steps.check.outputs.need_upload == 1
         run: |
