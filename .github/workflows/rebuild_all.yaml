@@ -71,7 +71,7 @@ jobs:
       - name: Download existing database
         if: steps.check.outputs.need_upload == 1
         run: |
-          rclone copy r2:/repo/archlinux/archlinux-sving1024/ ./old_repo/  --create-empty-src-dirs
+          rclone copy r2:/repo/archlinux/ ./old_repo/  --create-empty-src-dirs
       - uses: ./create-db
         if: steps.check.outputs.need_upload == 1
         with:
