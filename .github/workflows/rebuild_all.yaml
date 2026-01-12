@@ -75,7 +75,7 @@ jobs:
       - uses: ./create-db
         if: steps.check.outputs.need_upload == 1
         with:
-          repo: ./old_repo
+          repo_path: ./old_repo
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           package_path: ${{ steps.download.outputs.download-path }}
