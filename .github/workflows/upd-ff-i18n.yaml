@@ -154,23 +154,30 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: 'Sving1024/arch-repo'
-          # ref: 'dev'
+          ref: 'dev'
       - uses: actions/download-artifact@v4
         id: download
       - name: Display structure of downloaded files
         run: ls -R ${{ steps.download.outputs.download-path }}
+      - name: Setup Rclone
+        uses: AnimMouse/setup-rclone@v1.12.0
+        with:
+          rclone_config: ${{secrets.RCLONE_CONFIG_BASE64}}
+      - name: Download existing database
+        run: |
+          mkdir old_repo
+          rclone copy r2:/repo/archlinux/ ./old_repo/  --create-empty-src-dirs
       - uses: ./create-db
         with:
-          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
-          RCLONE_CONFIG_NAME: r2
-          dest_path: /repo/archlinux/
+          repo_path: ./old_repo
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
-          local_path: ${{ steps.download.outputs.download-path }}
+          package_path: ${{ steps.download.outputs.download-path }}
+          output_path: database
       - uses: actions/upload-artifact@v4
         with:
           name: database
-          path: upload_packages
+          path: database
   uploadToRemote:
     strategy:
       fail-fast: false
