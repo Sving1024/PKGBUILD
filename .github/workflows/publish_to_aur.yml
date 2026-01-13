@@ -189,6 +189,7 @@ jobs:
             echo "need_upload=1"
           fi
       - name: Display structure of downloaded files
+        if: steps.check.outputs.need_upload == 1
         run: ls -R ${{ steps.download.outputs.download-path }}
       - name: Setup Rclone
         if: steps.check.outputs.need_upload == 1
