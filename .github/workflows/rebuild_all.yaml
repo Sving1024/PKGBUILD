@@ -81,6 +81,9 @@ jobs:
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           package_path: ${{ steps.download.outputs.download-path }}
           output_path: src_repo
+      - name: removed gpg private file
+        if: steps.check.outputs.need_upload == 1
+        run: rm -rf ${HOME}/.gnupg
       - uses: ./sync-db
         if: steps.check.outputs.need_upload == 1
         with:
