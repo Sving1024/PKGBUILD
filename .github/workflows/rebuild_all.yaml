@@ -88,6 +88,7 @@ jobs:
           dest_repo_path: dest_repo
           repo_name: archlinux-sving1024
           output_path: database
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
 
       - name: Upload database artifact
         if: steps.check.outputs.need_upload == 1
