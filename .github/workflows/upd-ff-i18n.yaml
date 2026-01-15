@@ -167,15 +167,22 @@ jobs:
           rclone_config: ${{secrets.RCLONE_CONFIG_BASE64}}
       - name: Download existing database
         run: |
-          mkdir old_repo
-          rclone copy r2:/repo/archlinux/ ./old_repo/  --create-empty-src-dirs
+          mkdir dest_repo
+          rclone copy r2:/repo/archlinux/ ./dest_repo/  --create-empty-src-dirs
       - uses: ./create-db
         with:
-          repo_path: ./old_repo
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           package_path: ${{ steps.download.outputs.download-path }}
+          output_path: src_repo
+      - uses: ./sync-db
+        with:
+          src_repo_path: src_repo
+          dest_repo_path: dest_repo
+          repo_name: archlinux-sving1024
           output_path: database
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
+
       - uses: actions/upload-artifact@v4
         with:
           name: database
