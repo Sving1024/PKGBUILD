@@ -74,6 +74,14 @@ jobs:
         run: |
           mkdir dest_repo
           rclone copy r2:/repo/archlinux/ ./dest_repo/  --create-empty-src-dirs
+      - uses: ./sync-db
+        if: steps.check.outputs.need_upload == 1
+        with:
+          src_repo_path: src_repo
+          dest_repo_path: dest_repo
+          repo_name: archlinux-sving1024
+          output_path: database
+          gpg-privatekey: ${{ secrets.gpg_private_key }}
       - uses: ./create-db
         if: steps.check.outputs.need_upload == 1
         with:
@@ -84,14 +92,7 @@ jobs:
       - name: removed gpg private file
         if: steps.check.outputs.need_upload == 1
         run: rm -rf /github/home/.gnupg
-      - uses: ./sync-db
-        if: steps.check.outputs.need_upload == 1
-        with:
-          src_repo_path: src_repo
-          dest_repo_path: dest_repo
-          repo_name: archlinux-sving1024
-          output_path: database
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
+      
 
       - name: Upload database artifact
         if: steps.check.outputs.need_upload == 1
