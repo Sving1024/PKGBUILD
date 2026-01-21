@@ -181,6 +181,7 @@ jobs:
         with:
           src_repo_path: src_repo
           dest_repo_path: dest_repo
+          repo_name: archlinux-sving1024
           output_path: new_packages
       - uses: ./create-db
         if: steps.check.outputs.need_upload == 1
