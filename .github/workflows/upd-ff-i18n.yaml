@@ -170,19 +170,25 @@ jobs:
           mkdir dest_repo
           rclone copy r2:/repo/archlinux/ ./dest_repo/  --create-empty-src-dirs
       - uses: ./create-db
+        if: steps.check.outputs.need_upload == 1
         with:
           repo_name: archlinux-sving1024
           gpg-privatekey: ${{ secrets.gpg_private_key }}
           package_path: ${{ steps.download.outputs.download-path }}
           output_path: src_repo
       - uses: ./sync-db
+        if: steps.check.outputs.need_upload == 1
         with:
           src_repo_path: src_repo
           dest_repo_path: dest_repo
+          output_path: new_packages
+      - uses: ./create-db
+        if: steps.check.outputs.need_upload == 1
+        with:
           repo_name: archlinux-sving1024
-          output_path: database
           gpg-privatekey: ${{ secrets.gpg_private_key }}
-
+          package_path: new_packages
+          output_path: database
       - uses: actions/upload-artifact@v4
         with:
           name: database
