@@ -6,7 +6,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repo: [python-cyaron,  python-xeger-bin,  python-dnsstamps, python-accesser, ac-library]
+        # repo: [python-cyaron,  python-xeger-bin,  python-dnsstamps, python-accesser, ac-library]
+        repo: [python-cyaron]
     name: Rebuild
     runs-on: ubuntu-latest
     container: archlinux
