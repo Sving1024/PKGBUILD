@@ -184,7 +184,7 @@ jobs:
       - uses: ./create-db
         with:
           repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
           package_path: new_packages
           output_path: database
       - uses: actions/upload-artifact@v4

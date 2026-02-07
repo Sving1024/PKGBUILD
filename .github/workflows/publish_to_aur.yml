@@ -205,7 +205,7 @@ jobs:
         if: steps.check.outputs.need_upload == 1
         with:
           repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
           package_path: ${{ steps.download.outputs.download-path }}
           output_path: src_repo
       - uses: ./sync-db
@@ -219,7 +219,7 @@ jobs:
         if: steps.check.outputs.need_upload == 1
         with:
           repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
+          gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
           package_path: new_packages
           output_path: database
       - name: Upload database artifact
