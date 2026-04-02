@@ -232,7 +232,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        remote: [onedrive, r2]
+        remote: [r2]
     runs-on: ubuntu-latest
     needs: [create_database]
     if: needs.create_database.outputs.need_upload == 1 && always()

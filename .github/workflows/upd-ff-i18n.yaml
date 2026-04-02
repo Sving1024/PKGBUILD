@@ -195,7 +195,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        remote: [onedrive, r2]
+        remote: [r2]
     runs-on: ubuntu-latest
     if: always()
     needs: [create_database]
