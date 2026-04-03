@@ -1,0 +1,3 @@
+[python-svix]
+source = "pypi"
+pypi = "svix"
