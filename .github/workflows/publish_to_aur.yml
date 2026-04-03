@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        repo: [python-cyaron, python-xeger-bin, python-dnsstamps, ac-library, python-svix]
+        repo: [python-cyaron, python-xeger-bin, python-dnsstamps, ac-library, python-svix, python-standardwebhooks]
     name: publish to aur
     runs-on: ubuntu-latest
     container: archlinux
