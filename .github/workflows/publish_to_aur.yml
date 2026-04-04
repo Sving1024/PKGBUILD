@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Install depends
         run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      - uses: 
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           path: 'PKGBUILD'
