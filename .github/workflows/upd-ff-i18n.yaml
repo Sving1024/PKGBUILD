@@ -26,7 +26,7 @@ jobs:
           echo "language=$(echo_language ${{matrix.lang}})" >> "${GITHUB_OUTPUT}"
       - name: Install dependencies and update
         run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
       - name: create user for further steps
@@ -74,10 +74,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: [update_i18n_packages, prepare]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
       - name: remove old ver
         run: rm -rf firefox-nightly-i18n/*
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         with:
           path: firefox-nightly-i18n/
       - uses: actions-js/push@v1.5
@@ -95,7 +95,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [update_i18n_packages, prepare]
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         with:
           name: ${{matrix.lang}}
           path: ${{matrix.lang}}
@@ -107,7 +107,7 @@ jobs:
       - name: Cat PKGBUILD
         run: cat ${{matrix.lang}}/PKGBUILD
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: firefox-nightly-i18n-${{matrix.lang}}
           test: false
@@ -127,7 +127,7 @@ jobs:
     runs-on: ubuntu-latest
     if: always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'vifly/arch-build'
       - name: configure pgp server
@@ -151,11 +151,11 @@ jobs:
     if: always()
     needs: [buildAUR]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'Sving1024/arch-repo'
           ref: 'dev'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         id: download
         with:
           path: packages
@@ -200,11 +200,11 @@ jobs:
     if: always()
     needs: [create_database]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'Sving1024/arch-repo'
           # ref: 'dev'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         id: download
         with:
           name: database

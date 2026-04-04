@@ -14,7 +14,7 @@ jobs:
     steps:
       - name: Install depends
         run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      - uses: actions/checkout@v4
+      - uses: 
         with:
           fetch-depth: 0
           path: 'PKGBUILD'
@@ -25,7 +25,7 @@ jobs:
           echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
           cd ..
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: ${{matrix.repo}}
           test: false
@@ -47,7 +47,7 @@ jobs:
     steps:
       - name: Install depends
         run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           path: 'PKGBUILD'
@@ -73,7 +73,7 @@ jobs:
           echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
           cd ..
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: ${{matrix.repo}}
           test: false
@@ -84,7 +84,7 @@ jobs:
           commit_message: ${{steps.MSG.outputs.commit_msg}}
           allow_empty_commits: false
           pkgbuild: PKGBUILD/${{matrix.repo}}/PKGBUILD
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'vifly/arch-build'
         if: steps.pkgver.outputs.need_rebuild != 0
@@ -109,7 +109,7 @@ jobs:
     steps:
       - name: Install depends
         run: pacman -Syu --noconfirm --needed --overwrite '*' openssh sudo base-devel git fakeroot binutils gcc awk binutils xz libarchive bzip2 coreutils file findutils gettext grep gzip sed ncurses util-linux pacman-contrib debugedit
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
           path: 'PKGBUILD'
@@ -135,7 +135,7 @@ jobs:
           echo need_rebuild=$(vercmp $ver_old $ver_new) >> $GITHUB_OUTPUT
           cd ..
       - name: Publish AUR package
-        uses: KSXGitHub/github-actions-deploy-aur@v3.0.1
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: ${{matrix.repo}}
           test: false
@@ -149,7 +149,7 @@ jobs:
           assets: |
             PKGBUILD/${{matrix.repo}}/accesser.service
             PKGBUILD/${{matrix.repo}}/${{matrix.repo}}.install
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'vifly/arch-build'
         if: steps.pkgver.outputs.need_rebuild != 0
@@ -170,11 +170,11 @@ jobs:
     outputs:
       need_upload: ${{steps.check.outputs.need_upload}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'Sving1024/arch-repo'
           ref: 'dev'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         id: download
         with:
           path: packages
@@ -237,10 +237,10 @@ jobs:
     needs: [create_database]
     if: needs.create_database.outputs.need_upload == 1 && always()
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6.0.2
         with:
           repository: 'Sving1024/arch-repo'
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8.0.1
         id: download
         with:
           name: database
