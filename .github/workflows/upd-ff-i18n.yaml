@@ -54,37 +54,9 @@ jobs:
           makepkg
           cat PKGBUILD
           cd ..
-  prepare:
-    name: get new pkgver
-    runs-on: ubuntu-latest
-    outputs:
-      pkgver: ${{ steps.get-new-pkgver.outputs.pkgver }}
-      version: ${{ steps.get-new-pkgver.outputs.version }}
-    steps:
-      - name: get new pkgver
-        id: get-new-pkgver
-        run: |
-          _url=https://ftp.mozilla.org/pub/firefox/nightly
-          _version=$(curl "${CURL_OPTS[@]}" ${_url}/latest-mozilla-central-l10n/linux-x86_64/xpi/ | grep "ach.langpack.xpi" | sed "s/^.*>firefox-//; s/\.ach.*//" | sort -n | tail -n 1)
-          _build_id_raw="$(curl -s "${_url}/latest-mozilla-central-l10n/firefox-${_version}.ach.linux-x86_64.checksums" | grep '.partial.mar' | cut -d' ' -f4 | grep -E -o '[[:digit:]]{14}' | sort | tail -n1)"
-          declare -A _build_id
-          _build_id=(
-            [year]="${_build_id_raw:0:4}"
-            [month]="${_build_id_raw:4:2}"
-            [day]="${_build_id_raw:6:2}"
-            [hour]="${_build_id_raw:8:2}"
-            [min]="${_build_id_raw:10:2}"
-            [sec]="${_build_id_raw:12:2}"
-            [date]="${_build_id_raw:0:8}"
-            [time]="${_build_id_raw:8:6}"
-          )
-          _build_id_date=${_build_id[date]}
-          _build_id_time=${_build_id[time]}
-          echo "version=${_version}" >> "${GITHUB_OUTPUT}"
-          echo "pkgver=$(printf "%s.%s.%s" ${_version} ${_build_id_date} ${_build_id_time})" >> "${GITHUB_OUTPUT}"
   push_updates:
     runs-on: ubuntu-latest
-    needs: [update_i18n_packages, prepare]
+    needs: [update_i18n_packages]
     steps:
       - uses: actions/checkout@v6.0.2
       - name: remove old ver
@@ -109,7 +81,7 @@ jobs:
         lang: [ach, af, an, ar, ast, az, be, bg, bn, br, bs, ca-valencia, ca, cak, cs, cy, da, de, dsb, el, en-ca, en-gb, eo, es-ar, es-cl, es-es, es-mx, et, eu, fa, ff, fi, fr, fy-nl, ga-ie, gd, gl, gn, gu-in, he, hi-in, hr, hsb, hu, hy-am, ia, id, is, it, ja, ka, kab, kk, km, kn, ko, lij, lt, lv, mk, mr, ms, my, nb-no, ne-np, nl, nn-no, oc, pa-in, pl, pt-br, pt-pt, rm, ro, ru, si, sk, sl, son, sq, sr, sv-se, ta, te, th, tl, tr, trs, uk, ur, uz, vi, xh, zh-cn, zh-tw]
     name: publish to aur
     runs-on: ubuntu-latest
-    needs: [update_i18n_packages, prepare]
+    needs: [update_i18n_packages]
     steps:
       - uses: actions/download-artifact@v8.0.1
         with:
