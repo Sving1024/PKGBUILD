@@ -92,10 +92,14 @@ jobs:
       - uses: actions/download-artifact@v8.0.1
         with:
           path: firefox-nightly-i18n/
+      - name: get pkgver
+        id: pkgver
+        run: |
+          cat firefox-nightly-i18n/ach/PKGBUILD | grep pkgver= >> ${GITHUB_OUTPUT}
       - uses: actions-js/push@v1.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          message: "update to ${{ needs.prepare.outputs.pkgver }}"
+          message: "update to ${{ steps.pkgver.outputs.pkgver }}"
           branch: main
   publish_to_aur:
     strategy:
@@ -112,8 +116,9 @@ jobs:
           name: ${{matrix.lang}}
           path: ${{matrix.lang}}
       - name: get pkgver
+        id: pkgver
         run: |
-          cat ${{matrix.lang}}/PKGBUILD | grep pkgver >> ${GITHUB_OUTPUT}
+          cat ${{matrix.lang}}/PKGBUILD | grep pkgver= >> ${GITHUB_OUTPUT}
       - name: Cat PKGBUILD
         run: cat ${{matrix.lang}}/PKGBUILD
       - name: Publish AUR package
@@ -125,7 +130,7 @@ jobs:
           commit_username: "github-actions[bot]"
           commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: "update to ${{ needs.prepare.outputs.pkgver }}"
+          commit_message: "update to ${{ steps.pkgver.outputs.pkgver }}"
           allow_empty_commits: false
           pkgbuild: ${{matrix.lang}}/PKGBUILD
   buildAUR:
