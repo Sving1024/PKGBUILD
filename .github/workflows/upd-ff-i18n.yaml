@@ -47,6 +47,9 @@ jobs:
     runs-on: ubuntu-latest
     container: archlinux
     steps:
+      - uses: actions/checkout@v6.0.2
+        with:
+          fetch-depth: 0
       - name: update pkgver
         run: |
           cd ./firefox-nightly-bin
