@@ -42,7 +42,7 @@ jobs:
         with:
           name: ${{steps.get_lang_val.outputs.language_short}}
           path: "./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/"
-  update_i18n_packages:
+  update_bin_packages:
     name: update pkgver of i18n packages
     runs-on: ubuntu-latest
     container: archlinux
@@ -111,11 +111,9 @@ jobs:
         with:
           name: ${{matrix.lang}}
           path: ${{matrix.lang}}
-      - name: debug
+      - name: get pkgver
         run: |
-          ls
-          pwd
-          tree
+          cat ${{matrix.lang}}/PKGBUILD | grep pkgver >> ${GITHUB_OUTPUT}
       - name: Cat PKGBUILD
         run: cat ${{matrix.lang}}/PKGBUILD
       - name: Publish AUR package
