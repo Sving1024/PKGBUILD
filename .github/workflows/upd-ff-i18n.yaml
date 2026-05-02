@@ -41,7 +41,19 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: ${{steps.get_lang_val.outputs.language_short}}
-          path: "./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/          \n"
+          path: "./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/"
+  update_i18n_packages:
+    name: update pkgver of i18n packages
+    runs-on: ubuntu-latest
+    container: archlinux
+    steps:
+      - name: update pkgver
+        run: |
+          cd ./firefox-nightly-bin
+          ./get_latest_version
+          makepkg
+          cat PKGBUILD
+          cd ..
   prepare:
     name: get new pkgver
     runs-on: ubuntu-latest
