@@ -53,7 +53,7 @@ jobs:
       - name: update pkgver
         run: |
           cd ./firefox-nightly-bin
-          ./get_latest_version
+          ./get_latest_version.sh
           makepkg
           cat PKGBUILD
           cd ..
