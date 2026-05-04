@@ -21,7 +21,6 @@ echo "pkgver=${pkgver}"
 
 sed -i "s/pkgver=.*$/pkgver=${pkgver}/" PKGBUILD
 sed -i "s/_version=.*$/_version=${_version}/" PKGBUILD
-sed -i "s/_language=placeholder/_language=\"$2\"/" PKGBUILD
-sed -i "s/_language_short=placeholder/_language_short=$1/" PKGBUILD
+sed -i "s/_build_id_raw=.*$/_build_id_raw=${_build_id_raw}/" PKGBUILD
 cat PKGBUILD
 updpkgsums

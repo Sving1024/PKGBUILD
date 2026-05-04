@@ -62,7 +62,7 @@ jobs:
         run: |
           cd ./firefox-nightly-bin
           sudo -Eu builder sh ./get_latest_version.sh
-          sudo -Eu builder sh makepkg
+          sudo -Eu builder makepkg --nodeps
           cat PKGBUILD
           cd ..
   push_updates:
