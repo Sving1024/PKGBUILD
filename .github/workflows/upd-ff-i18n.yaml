@@ -43,10 +43,12 @@ jobs:
           name: ${{steps.get_lang_val.outputs.language_short}}
           path: "./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/"
   update_bin_packages:
-    name: update pkgver of i18n packages
+    name: update pkgver of firefox-nightly-bin
     runs-on: ubuntu-latest
     container: archlinux
     steps:
+      - name: Install dependencies and update
+        run: pacman -Syu --noconfirm --noprogressbar --needed base-devel git pacman-contrib
       - uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
