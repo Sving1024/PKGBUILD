@@ -101,7 +101,8 @@ jobs:
       max-parallel: 3
       fail-fast: false
       matrix:
-        lang: [ach, af, an, ar, ast, az, be, bg, bn, br, bs, ca-valencia, ca, cak, cs, cy, da, de, dsb, el, en-ca, en-gb, eo, es-ar, es-cl, es-es, es-mx, et, eu, fa, ff, fi, fr, fy-nl, ga-ie, gd, gl, gn, gu-in, he, hi-in, hr, hsb, hu, hy-am, ia, id, is, it, ja, ka, kab, kk, km, kn, ko, lij, lt, lv, mk, mr, ms, my, nb-no, ne-np, nl, nn-no, oc, pa-in, pl, pt-br, pt-pt, rm, ro, ru, si, sk, sl, son, sq, sr, sv-se, ta, te, th, tl, tr, trs, uk, ur, uz, vi, xh, zh-cn, zh-tw]
+#        lang: [ach, af, an, ar, ast, az, be, bg, bn, br, bs, ca-valencia, ca, cak, cs, cy, da, de, dsb, el, en-ca, en-gb, eo, es-ar, es-cl, es-es, es-mx, et, eu, fa, ff, fi, fr, fy-nl, ga-ie, gd, gl, gn, gu-in, he, hi-in, hr, hsb, hu, hy-am, ia, id, is, it, ja, ka, kab, kk, km, kn, ko, lij, lt, lv, mk, mr, ms, my, nb-no, ne-np, nl, nn-no, oc, pa-in, pl, pt-br, pt-pt, rm, ro, ru, si, sk, sl, son, sq, sr, sv-se, ta, te, th, tl, tr, trs, uk, ur, uz, vi, xh, zh-cn, zh-tw]
+        lang: [ach]
     name: publish to aur
     runs-on: ubuntu-latest
     needs: [update_i18n_packages]
