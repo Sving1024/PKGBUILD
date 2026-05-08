@@ -24,7 +24,7 @@ jobs:
         id: MSG
         run: |
           cd PKGBUILD
-          echo "commit_msg=$(git log -1 --format='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
+          echo "commit_msg=$(git log -1 --for--nodepsmat='%s' -- ${{matrix.repo}}/)" >> "$GITHUB_OUTPUT"
           cd ..
       - uses: actions/checkout@v6.0.2
         with:
