@@ -87,8 +87,7 @@ jobs:
           path: firefox-nightly-i18n/
       - name: move bin package
         run: |
-          mkdir firefox-nightly-bin
-          mv firefox-nightly-i18n/bin/ firefox-nightly-bin/
+          mv firefox-nightly-i18n/bin firefox-nightly-bin
           ls -laZ
           ls -laZ firefox-nightly-bin
       - name: get pkgver
