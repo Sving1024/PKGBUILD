@@ -159,97 +159,97 @@ jobs:
             bin/policies.json
             bin/firefox-nightly.desktop
 
-  buildAUR:
-    needs: [publish_to_aur, publish_bin_to_aur]
-    strategy:
-      matrix:
-        repos: [firefox-nightly-i18n-ach, firefox-nightly-i18n-af, firefox-nightly-i18n-an, firefox-nightly-i18n-ar, firefox-nightly-i18n-ast, firefox-nightly-i18n-az, firefox-nightly-i18n-be, firefox-nightly-i18n-bg, firefox-nightly-i18n-bn, firefox-nightly-i18n-br, firefox-nightly-i18n-bs, firefox-nightly-i18n-ca-valencia, firefox-nightly-i18n-ca, firefox-nightly-i18n-cak, firefox-nightly-i18n-cs, firefox-nightly-i18n-cy, firefox-nightly-i18n-da, firefox-nightly-i18n-de, firefox-nightly-i18n-dsb, firefox-nightly-i18n-el, firefox-nightly-i18n-en-ca, firefox-nightly-i18n-en-gb, firefox-nightly-i18n-eo, firefox-nightly-i18n-es-ar, firefox-nightly-i18n-es-cl, firefox-nightly-i18n-es-es, firefox-nightly-i18n-es-mx, firefox-nightly-i18n-et, firefox-nightly-i18n-eu, firefox-nightly-i18n-fa, firefox-nightly-i18n-ff, firefox-nightly-i18n-fi, firefox-nightly-i18n-fr, firefox-nightly-i18n-fy-nl, firefox-nightly-i18n-ga-ie, firefox-nightly-i18n-gd, firefox-nightly-i18n-gl, firefox-nightly-i18n-gn, firefox-nightly-i18n-gu-in, firefox-nightly-i18n-he, firefox-nightly-i18n-hi-in, firefox-nightly-i18n-hr, firefox-nightly-i18n-hsb, firefox-nightly-i18n-hu, firefox-nightly-i18n-hy-am, firefox-nightly-i18n-ia, firefox-nightly-i18n-id, firefox-nightly-i18n-is, firefox-nightly-i18n-it, firefox-nightly-i18n-ja, firefox-nightly-i18n-ka, firefox-nightly-i18n-kab, firefox-nightly-i18n-kk, firefox-nightly-i18n-km, firefox-nightly-i18n-kn, firefox-nightly-i18n-ko, firefox-nightly-i18n-lij, firefox-nightly-i18n-lt, firefox-nightly-i18n-lv, firefox-nightly-i18n-mk, firefox-nightly-i18n-mr, firefox-nightly-i18n-ms, firefox-nightly-i18n-my, firefox-nightly-i18n-nb-no, firefox-nightly-i18n-ne-np, firefox-nightly-i18n-nl, firefox-nightly-i18n-nn-no, firefox-nightly-i18n-oc, firefox-nightly-i18n-pa-in, firefox-nightly-i18n-pl, firefox-nightly-i18n-pt-br, firefox-nightly-i18n-pt-pt, firefox-nightly-i18n-rm, firefox-nightly-i18n-ro, firefox-nightly-i18n-ru, firefox-nightly-i18n-si, firefox-nightly-i18n-sk, firefox-nightly-i18n-sl, firefox-nightly-i18n-son, firefox-nightly-i18n-sq, firefox-nightly-i18n-sr, firefox-nightly-i18n-sv-se, firefox-nightly-i18n-ta, firefox-nightly-i18n-te, firefox-nightly-i18n-th, firefox-nightly-i18n-tl, firefox-nightly-i18n-tr, firefox-nightly-i18n-trs, firefox-nightly-i18n-uk, firefox-nightly-i18n-ur, firefox-nightly-i18n-uz, firefox-nightly-i18n-vi, firefox-nightly-i18n-xh, firefox-nightly-i18n-zh-cn, firefox-nightly-i18n-zh-tw, firefox-nightly-bin]
-      fail-fast: false
-    runs-on: ubuntu-latest
-    if: always()
-    steps:
-      - uses: actions/checkout@v6.0.2
-        with:
-          repository: 'vifly/arch-build'
-      - name: configure pgp server
-        run: |
-          sed -i '22i sudo --set-home -u builder gpg --keyserver hkps://keys.openpgp.org --recv-keys 14F26682D0916CDD81E37B6D61B7B526D98F0353' ./build-aur-action/entrypoint.sh
-      - uses: ./build-aur-action
-        with:
-          repo-name: ${{ matrix.repos }}
-      - uses: actions/upload-artifact@v4
-        with:
-          path: ./*/*.pkg.tar.zst
-          name: ${{ matrix.repos }}
-          if-no-files-found: error
-  create_database:
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [buildAUR]
-    steps:
-      - uses: actions/checkout@v6.0.2
-        with:
-          repository: 'Sving1024/arch-repo'
-          ref: 'dev'
-      - uses: actions/download-artifact@v8.0.1
-        id: download
-        with:
-          path: packages
-      - name: Display structure of downloaded files
-        run: ls -R ${{ steps.download.outputs.download-path }}
-      - name: Setup Rclone
-        uses: AnimMouse/setup-rclone@v1.12.0
-        with:
-          rclone_config: ${{secrets.RCLONE_CONFIG_BASE64}}
-      - name: Download existing database
-        run: |
-          mkdir dest_repo
-          rclone copy r2:/repo/archlinux/ ./dest_repo/  --create-empty-src-dirs
-      - uses: ./create-db
-        with:
-          repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.gpg_private_key }}
-          package_path: ${{ steps.download.outputs.download-path }}
-          output_path: src_repo
-      - uses: ./sync-db
-        with:
-          src_repo_path: src_repo
-          dest_repo_path: dest_repo
-          repo_name: archlinux-sving1024
-          output_path: new_packages
-      - uses: ./create-db
-        with:
-          repo_name: archlinux-sving1024
-          gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
-          package_path: new_packages
-          output_path: database
-      - uses: actions/upload-artifact@v4
-        with:
-          name: database
-          path: database
-  uploadToRemote:
-    strategy:
-      fail-fast: false
-      matrix:
-        remote: [r2]
-    runs-on: ubuntu-latest
-    if: always()
-    needs: [create_database]
-    steps:
-      - uses: actions/checkout@v6.0.2
-        with:
-          repository: 'Sving1024/arch-repo'
-          # ref: 'dev'
-      - uses: actions/download-artifact@v8.0.1
-        id: download
-        with:
-          name: database
-      - name: Display structure of downloaded files
-        run: ls -R ${{ steps.download.outputs.download-path }}
-      - uses: ./upload
-        with:
-          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
-          RCLONE_CONFIG_NAME: ${{matrix.remote}}
-          dest_path: /repo/archlinux/
-          repo_name: archlinux-sving1024
-          local_path: ${{ steps.download.outputs.download-path }}
+#  buildAUR:
+#    needs: [publish_to_aur, publish_bin_to_aur]
+#    strategy:
+#      matrix:
+#        repos: [firefox-nightly-i18n-ach, firefox-nightly-i18n-af, firefox-nightly-i18n-an, firefox-nightly-i18n-ar, firefox-nightly-i18n-ast, firefox-nightly-i18n-az, firefox-nightly-i18n-be, firefox-nightly-i18n-bg, firefox-nightly-i18n-bn, firefox-nightly-i18n-br, firefox-nightly-i18n-bs, firefox-nightly-i18n-ca-valencia, firefox-nightly-i18n-ca, firefox-nightly-i18n-cak, firefox-nightly-i18n-cs, firefox-nightly-i18n-cy, firefox-nightly-i18n-da, firefox-nightly-i18n-de, firefox-nightly-i18n-dsb, firefox-nightly-i18n-el, firefox-nightly-i18n-en-ca, firefox-nightly-i18n-en-gb, firefox-nightly-i18n-eo, firefox-nightly-i18n-es-ar, firefox-nightly-i18n-es-cl, firefox-nightly-i18n-es-es, firefox-nightly-i18n-es-mx, firefox-nightly-i18n-et, firefox-nightly-i18n-eu, firefox-nightly-i18n-fa, firefox-nightly-i18n-ff, firefox-nightly-i18n-fi, firefox-nightly-i18n-fr, firefox-nightly-i18n-fy-nl, firefox-nightly-i18n-ga-ie, firefox-nightly-i18n-gd, firefox-nightly-i18n-gl, firefox-nightly-i18n-gn, firefox-nightly-i18n-gu-in, firefox-nightly-i18n-he, firefox-nightly-i18n-hi-in, firefox-nightly-i18n-hr, firefox-nightly-i18n-hsb, firefox-nightly-i18n-hu, firefox-nightly-i18n-hy-am, firefox-nightly-i18n-ia, firefox-nightly-i18n-id, firefox-nightly-i18n-is, firefox-nightly-i18n-it, firefox-nightly-i18n-ja, firefox-nightly-i18n-ka, firefox-nightly-i18n-kab, firefox-nightly-i18n-kk, firefox-nightly-i18n-km, firefox-nightly-i18n-kn, firefox-nightly-i18n-ko, firefox-nightly-i18n-lij, firefox-nightly-i18n-lt, firefox-nightly-i18n-lv, firefox-nightly-i18n-mk, firefox-nightly-i18n-mr, firefox-nightly-i18n-ms, firefox-nightly-i18n-my, firefox-nightly-i18n-nb-no, firefox-nightly-i18n-ne-np, firefox-nightly-i18n-nl, firefox-nightly-i18n-nn-no, firefox-nightly-i18n-oc, firefox-nightly-i18n-pa-in, firefox-nightly-i18n-pl, firefox-nightly-i18n-pt-br, firefox-nightly-i18n-pt-pt, firefox-nightly-i18n-rm, firefox-nightly-i18n-ro, firefox-nightly-i18n-ru, firefox-nightly-i18n-si, firefox-nightly-i18n-sk, firefox-nightly-i18n-sl, firefox-nightly-i18n-son, firefox-nightly-i18n-sq, firefox-nightly-i18n-sr, firefox-nightly-i18n-sv-se, firefox-nightly-i18n-ta, firefox-nightly-i18n-te, firefox-nightly-i18n-th, firefox-nightly-i18n-tl, firefox-nightly-i18n-tr, firefox-nightly-i18n-trs, firefox-nightly-i18n-uk, firefox-nightly-i18n-ur, firefox-nightly-i18n-uz, firefox-nightly-i18n-vi, firefox-nightly-i18n-xh, firefox-nightly-i18n-zh-cn, firefox-nightly-i18n-zh-tw, firefox-nightly-bin]
+#      fail-fast: false
+#    runs-on: ubuntu-latest
+#    if: always()
+#    steps:
+#      - uses: actions/checkout@v6.0.2
+#        with:
+#          repository: 'vifly/arch-build'
+#      - name: configure pgp server
+#        run: |
+#          sed -i '22i sudo --set-home -u builder gpg --keyserver hkps://keys.openpgp.org --recv-keys 14F26682D0916CDD81E37B6D61B7B526D98F0353' ./build-aur-action/entrypoint.sh
+#      - uses: ./build-aur-action
+#        with:
+#          repo-name: ${{ matrix.repos }}
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          path: ./*/*.pkg.tar.zst
+#          name: ${{ matrix.repos }}
+#          if-no-files-found: error
+#  create_database:
+#    runs-on: ubuntu-latest
+#    if: always()
+#    needs: [buildAUR]
+#    steps:
+#      - uses: actions/checkout@v6.0.2
+#        with:
+#          repository: 'Sving1024/arch-repo'
+#          ref: 'dev'
+#      - uses: actions/download-artifact@v8.0.1
+#        id: download
+#        with:
+#          path: packages
+#      - name: Display structure of downloaded files
+#        run: ls -R ${{ steps.download.outputs.download-path }}
+#      - name: Setup Rclone
+#        uses: AnimMouse/setup-rclone@v1.12.0
+#        with:
+#          rclone_config: ${{secrets.RCLONE_CONFIG_BASE64}}
+#      - name: Download existing database
+#        run: |
+#          mkdir dest_repo
+#          rclone copy r2:/repo/archlinux/ ./dest_repo/  --create-empty-src-dirs
+#      - uses: ./create-db
+#        with:
+#          repo_name: archlinux-sving1024
+#          gpg-privatekey: ${{ secrets.gpg_private_key }}
+#          package_path: ${{ steps.download.outputs.download-path }}
+#          output_path: src_repo
+#      - uses: ./sync-db
+#        with:
+#          src_repo_path: src_repo
+#          dest_repo_path: dest_repo
+#          repo_name: archlinux-sving1024
+#          output_path: new_packages
+#      - uses: ./create-db
+#        with:
+#          repo_name: archlinux-sving1024
+#          gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
+#          package_path: new_packages
+#          output_path: database
+#      - uses: actions/upload-artifact@v4
+#        with:
+#          name: database
+#          path: database
+#  uploadToRemote:
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        remote: [r2]
+#    runs-on: ubuntu-latest
+#    if: always()
+#    needs: [create_database]
+#    steps:
+#      - uses: actions/checkout@v6.0.2
+#        with:
+#          repository: 'Sving1024/arch-repo'
+#          # ref: 'dev'
+#      - uses: actions/download-artifact@v8.0.1
+#        id: download
+#        with:
+#          name: database
+#      - name: Display structure of downloaded files
+#        run: ls -R ${{ steps.download.outputs.download-path }}
+#      - uses: ./upload
+#        with:
+#          RCLONE_CONFIG_CONTENT: ${{secrets.RCLONE_CONFIG}}
+#          RCLONE_CONFIG_NAME: ${{matrix.remote}}
+#          dest_path: /repo/archlinux/
+#          repo_name: archlinux-sving1024
+#          local_path: ${{ steps.download.outputs.download-path }}
