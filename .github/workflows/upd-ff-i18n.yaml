@@ -84,6 +84,8 @@ jobs:
           cat PKGBUILD
           cat PKGBUILD | grep pkgver= > ${GITHUB_OUTPUT}
           cd ..
+          pwd
+          ls -laZ
       - uses: actions-js/push@v1.5
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
