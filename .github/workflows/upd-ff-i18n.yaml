@@ -38,7 +38,9 @@ jobs:
           pwd
       - name: upd
         id: update
-        run: sudo -Eu builder sh ./.github/workflows/upd-ff-i18n.sh ${{matrix.lang}}
+        run: |
+          sudo -Eu builder sh ./.github/workflows/upd-ff-i18n.sh ${{matrix.lang}}
+          rm -rf ./*.tar.xz ./*.tar.xz.asc
       - uses: actions/upload-artifact@v4
         with:
           name: ${{steps.get_lang_val.outputs.language_short}}
@@ -149,6 +151,8 @@ jobs:
         with:
           pkgname: firefox-nightly-bin
           test: true
+          test_flags: --skippgpcheck --clean --cleanbuild --nodeps
+          # cannot import pgp keys, so skip it.
           updpkgsums: false
           commit_username: "github-actions[bot]"
           commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
