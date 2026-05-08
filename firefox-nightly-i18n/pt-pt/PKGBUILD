@@ -13,8 +13,8 @@ pkgver=152.0a1.20260508.130736
 
 depends=("firefox-nightly")
 
-_language="Acholi"
-_language_short=ach
+_language="Portuguese (Portugal)"
+_language_short=pt-PT
 _pkgname_base=firefox-nightly-i18n
 pkgname=${_pkgname_base}-${_language_short,,}
 pkgdesc="${_language} language pack for Firefox Nightly"
@@ -25,7 +25,7 @@ source=("${_pkgname_base}-${_language_short}-${pkgver}.xpi::$_url/firefox-${_ver
 # Don't extract anything
 noextract=("${_pkgname_base}-${_language_short}-${pkgver}.xpi")
 
-sha256sums=('02aa3212d364b50abbe08e0ff4a24faf15d5dd62e25f0522888f9cc7e7b41132')
+sha256sums=('189b2e303e60f8823e8023311e51c895523c9c4f35deb2d3035b90c6e2479ca8')
 
 package() {
   install -Dm644 "${_pkgname_base}-${_language_short}-${pkgver}.xpi" \
