@@ -64,7 +64,8 @@ jobs:
           sudo -Eu builder sh ./get_latest_version.sh
           cat PKGBUILD
           cat PKGBUILD | grep pkgver= > ${GITHUB_OUTPUT}
-          rm -rf ./*.tar.xz ./*.tar.xz.asc
+          sudo -Eu builder makepkg --skippgpcheck --clean --cleanbuild --nodeps
+          rm -rf ./*.tar.xz ./*.tar.xz.asc ./*.pkg.tar.zst ./*.pkg.tar.zst.sig
           cd ..
           pwd
           ls -laZ
@@ -150,9 +151,6 @@ jobs:
         uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
         with:
           pkgname: firefox-nightly-bin
-          test: true
-          test_flags: --skippgpcheck --clean --cleanbuild --nodeps
-          # cannot import pgp keys, so skip it.
           updpkgsums: false
           commit_username: "github-actions[bot]"
           commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
