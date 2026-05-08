@@ -128,36 +128,36 @@ jobs:
           commit_message: "update to ${{ steps.pkgver.outputs.pkgver }}"
           allow_empty_commits: false
           pkgbuild: ${{matrix.lang}}/PKGBUILD
-    publish_bin_to_aur:
-      needs: [update_bin_packages]
-      name: publish firefox-nightly-bin to aur
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/download-artifact@v8.0.1
-          with:
-            name: bin
-            path: bin
-        - name: get pkgver
-          id: pkgver
-          run: |
-            cat bin/PKGBUILD | grep pkgver= >> ${GITHUB_OUTPUT}
-        - name: Cat PKGBUILD
-          run: cat bin/PKGBUILD
-        - name: Publish AUR package
-          uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
-          with:
-            pkgname: firefox-nightly-bin
-            test: true
-            updpkgsums: false
-            commit_username: "github-actions[bot]"
-            commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
-            ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-            commit_message: "update to ${{ steps.pkgver.outputs.pkgver }}"
-            allow_empty_commits: false
-            pkgbuild: bin/PKGBUILD
-            assets: |
-              bin/policies.json
-              bin/firefox-nightly.desktop
+  publish_bin_to_aur:
+    needs: [update_bin_packages]
+    name: publish firefox-nightly-bin to aur
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8.0.1
+        with:
+          name: bin
+          path: bin
+      - name: get pkgver
+        id: pkgver
+        run: |
+          cat bin/PKGBUILD | grep pkgver= >> ${GITHUB_OUTPUT}
+      - name: Cat PKGBUILD
+        run: cat bin/PKGBUILD
+      - name: Publish AUR package
+        uses: KSXGitHub/github-actions-deploy-aur@v4.1.2
+        with:
+          pkgname: firefox-nightly-bin
+          test: true
+          updpkgsums: false
+          commit_username: "github-actions[bot]"
+          commit_email: "41898282+github-actions[bot]@users.noreply.github.com"
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: "update to ${{ steps.pkgver.outputs.pkgver }}"
+          allow_empty_commits: false
+          pkgbuild: bin/PKGBUILD
+          assets: |
+            bin/policies.json
+            bin/firefox-nightly.desktop
 
   buildAUR:
     needs: [publish_to_aur, publish_bin_to_aur]
