@@ -136,6 +136,7 @@ jobs:
         - uses: actions/download-artifact@v8.0.1
           with:
             name: bin
+            path: bin
         - name: get pkgver
           id: pkgver
           run: |
@@ -153,7 +154,11 @@ jobs:
             ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
             commit_message: "update to ${{ steps.pkgver.outputs.pkgver }}"
             allow_empty_commits: false
-            pkgbuild: ${{matrix.lang}}/PKGBUILD
+            pkgbuild: bin/PKGBUILD
+            assets: |
+              bin/policies.json
+              bin/firefox-nightly.desktop
+
   buildAUR:
     needs: [publish_to_aur, publish_bin_to_aur]
     strategy:
