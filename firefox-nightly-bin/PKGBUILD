@@ -36,7 +36,6 @@ pkgrel=1
 
 arch=('x86_64' 'aarch64')
 license=('MPL' 'GPL' 'LGPL')
-conflicts=('firefox-nightly')
 depends=(
   'dbus-glib'
   'gtk3'
