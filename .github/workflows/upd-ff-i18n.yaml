@@ -12,6 +12,7 @@ jobs:
     name: update pkgver of i18n packages
     runs-on: ubuntu-latest
     container: archlinux
+    timeout-minutes: 3
     steps:
       - name: get language var
         id: get_lang_val
@@ -38,7 +39,7 @@ jobs:
       - name: upd
         id: update
         run: sudo -Eu builder sh ./.github/workflows/upd-ff-i18n.sh ${{matrix.lang}}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: ${{steps.get_lang_val.outputs.language_short}}
           path: "./firefox-nightly-i18n/${{steps.get_lang_val.outputs.language_short}}/"
@@ -68,7 +69,7 @@ jobs:
           cd ..
           pwd
           ls -laZ
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: bin
           path: "./firefox-nightly-bin/"
@@ -178,7 +179,7 @@ jobs:
       - uses: ./build-aur-action
         with:
           repo-name: ${{ matrix.repos }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
           path: ./*/*.pkg.tar.zst
           name: ${{ matrix.repos }}
@@ -224,7 +225,7 @@ jobs:
           gpg-privatekey: ${{ secrets.GPG_PRIVATE_KEY }}
           package_path: new_packages
           output_path: database
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7.0.1
         with:
           name: database
           path: database
