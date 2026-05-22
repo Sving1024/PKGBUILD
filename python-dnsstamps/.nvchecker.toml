@@ -1,0 +1,3 @@
+[python-dnsstamps]
+source = "pypi"
+pypi = "dnsstamps"
