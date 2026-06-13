@@ -14,9 +14,6 @@ Add the following code snippet to your `/etc/pacman.conf`:
 [archlinux-sving1024]
 #Cloudflare R2
 Server = https://repo.sving1024.top/archlinux/
-#Onedrive
-Server = https://repo-vercel.sving1024.top/
-Server = https://repo-onedrive.sving1024.top/api/raw?path=/
 ```
 
 And import my pubkey:
