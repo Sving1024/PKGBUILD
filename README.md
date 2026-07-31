@@ -29,3 +29,17 @@ Now you can use `sudo pacman -S <pkg_name>` to install packages from my reposito
 You may also want to use [archlinuxcn](https://github.com/archlinuxcn/repo) with the repo together. Some of the dependencies are provided in the repo.
 
 Thanks vifly for his [arch-build](https://github.com/vifly/arch-build) project. If you want to build a repo like this, you can read [his post](https://viflythink.com/Use_GitHubActions_to_build_AUR/).
+
+## Known Issues
+
+> Firefox Nightly language pack checksum mismatch / language packs out of date
+
+TL; DR: I suggest you wait one or two hours and then try to build the package again.
+
+As Mozilla sometimes replaces the language packs without modifying the URL, the checksum will be out of date for one or two hours a day - that's expected.
+
+And I use GitHub Actions to update these packages; as there are over 100 packages, the workflow may take some time to complete. The workflow is currently running to update the packages, so please wait one or two hours, and then try to build it again.
+
+Moreover, if waiting several hours doesn't work, please try again the next day - sometimes the workflow will fail to update the packages (e.g., due to a network issue), and it usually will be fixed in the next workflow run.
+
+Please report if the language pack has been out of date for at least 3 days.
